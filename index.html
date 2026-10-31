@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Tandem">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/tandem-192.png" id="favicon">
+<link rel="apple-touch-icon" href="icons/tandem-touch-180.png" id="touchicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link id="font-tandem" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -61,11 +61,9 @@ h1,h2,h3,.brand,.th-num,.day-label b,.cell span:first-child{font-family:var(--fo
 /* Top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:54px}
-.brand{font-weight:var(--hw);font-size:22px;display:flex;align-items:center;gap:9px}
-.brand i{width:26px;height:16px;display:inline-block;position:relative}
-.brand i::before,.brand i::after{content:"";position:absolute;top:0;width:16px;height:16px;border-radius:50%;background:var(--m1,var(--accent));mix-blend-mode:multiply}
-.brand i::after{left:10px;background:var(--m2,var(--star))}
-:root[data-theme="dark"] .brand i::before,:root[data-theme="dark"] .brand i::after{mix-blend-mode:screen}
+.brand{font-weight:var(--hw);font-size:22px;display:flex;align-items:center;gap:10px}
+.logo{display:block;flex:none;width:32px;height:32px}
+.welcome .logo{width:84px;height:84px;margin:0 0 22px}
 .sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;font-weight:600}
 .sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .sync.ok::before{background:var(--ok)}
@@ -248,10 +246,15 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
 .sheet-wrap[hidden]{display:none}
 .scrim{position:absolute;inset:0;background:rgba(20,14,32,.45)}
-.sheet{position:relative;width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:8px 20px calc(20px + env(safe-area-inset-bottom,0px));animation:up .26s cubic-bezier(.2,.8,.3,1)}
+.sheet{position:relative;width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain;background:var(--surface);border-radius:28px 28px 0 0;padding:0 20px calc(20px + env(safe-area-inset-bottom,0px));animation:up .26s cubic-bezier(.2,.8,.3,1)}
 @media (min-width:600px){.sheet-wrap{align-items:center}.sheet{border-radius:28px}}
 @keyframes up{from{transform:translateY(40px);opacity:.5}}
-.grab{width:42px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 12px}
+.sheet-head{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;gap:12px;padding:22px 0 14px;background:var(--surface);touch-action:none}
+.grab{position:absolute;top:8px;left:50%;width:42px;height:5px;margin-left:-21px;border-radius:5px;background:var(--line)}
+.sheet-head h2{flex:1;min-width:0;margin:0!important;padding-top:4px}
+.sheet-x{flex:none;width:44px;height:44px;margin:-2px -6px 0 auto;border-radius:50%;background:var(--sunk);color:var(--ink);display:grid;place-items:center}
+.sheet-x svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+.sheet.dragging{transition:none;animation:none}
 .sheet h2{margin:0 0 16px;font-size:26px;font-weight:var(--hw)}
 .sheet h2 small{display:block;font-family:var(--font);font-size:15px;font-weight:700;color:var(--muted);margin-top:2px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
@@ -315,7 +318,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <div class="brand"><i aria-hidden="true"></i>Tandem</div>
+  <div class="brand"><svg class="logo" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="lgHead" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="56" y2="0"><stop offset="0" style="stop-color:var(--h1,#F4A3B8)"/><stop offset="1" style="stop-color:var(--h2,#A3ABF2)"/></linearGradient></defs><rect width="96" height="96" rx="22" fill="#2E2540"/><path d="M48 19 L17 46 H24 V80 H72 V46 H79 Z" fill="#EFEAF6" stroke="#EFEAF6" stroke-width="6" stroke-linejoin="round"/><path d="M48 52 C46 47.5 41.5 45 37 45.4 C32.2 45.8 29.6 50 30 54.6 C30.6 61 37 66.5 48 75 C59 66.5 65.4 61 66 54.6 C66.4 50 63.8 45.8 59 45.4 C54.5 45 50 47.5 48 52 Z" fill="#2E2540" stroke="url(#lgHead)" stroke-width="5.5" stroke-linejoin="round"/></svg>Tandem</div>
   <div id="sync" class="sync">Loading</div>
 </div></header>
 
@@ -563,6 +566,43 @@ function fxStyle(key){
 }
 const fxOn = key => !!fxStyle(key);
 
+/* ---------- Logo: plum house with a heart; each half of the heart is one person's color ---------- */
+const LOGO_HOUSE = 'M48 19 L17 46 H24 V80 H72 V46 H79 Z';
+const LOGO_HEART = 'M48 52 C46 47.5 41.5 45 37 45.4 C32.2 45.8 29.6 50 30 54.6 C30.6 61 37 66.5 48 75 C59 66.5 65.4 61 66 54.6 C66.4 50 63.8 45.8 59 45.4 C54.5 45 50 47.5 48 52 Z';
+const LOGO_DEFAULT = ['#F4A3B8', '#A3ABF2'];
+function soften(hex, amt = .18){ // a touch lighter so the heart line reads well on plum
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '')); if(!m) return hex;
+  const n = parseInt(m[1], 16), mix = c => Math.round(c + (255 - c) * amt);
+  return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(mix).map(c => c.toString(16).padStart(2, '0')).join('');
+}
+function heartColors(){
+  const ms = (mode === 'synced' || mode === 'offline') ? members() : [];
+  return [ms[0] ? soften(ms[0].color) : LOGO_DEFAULT[0], ms[1] ? soften(ms[1].color) : (ms[0] ? soften(ms[0].color) : LOGO_DEFAULT[1])];
+}
+function logoSvg(cls = 'logo'){
+  const id = 'lg' + Math.random().toString(36).slice(2, 7);
+  return `<svg class="${cls}" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="56" y2="0"><stop offset="0" style="stop-color:var(--h1,${LOGO_DEFAULT[0]})"/><stop offset="1" style="stop-color:var(--h2,${LOGO_DEFAULT[1]})"/></linearGradient></defs><rect width="96" height="96" rx="22" fill="#2E2540"/><path d="${LOGO_HOUSE}" fill="#EFEAF6" stroke="#EFEAF6" stroke-width="6" stroke-linejoin="round"/><path d="${LOGO_HEART}" fill="#2E2540" stroke="url(#${id})" stroke-width="5.5" stroke-linejoin="round"/></svg>`;
+}
+/* The browser tab icon and the iPhone home screen icon, drawn in your colors */
+let iconKey = '';
+function liveIcon(c1, c2){
+  const key = c1 + c2; if(key === iconKey) return; iconKey = key;
+  try {
+    const draw = (S, rounded) => {
+      const cv = document.createElement('canvas'); cv.width = cv.height = S; const x = cv.getContext('2d');
+      x.scale(S/96, S/96);
+      x.fillStyle = '#2E2540';
+      if(rounded){ x.beginPath(); x.roundRect ? x.roundRect(0, 0, 96, 96, 22) : x.rect(0, 0, 96, 96); x.fill(); } else x.fillRect(0, 0, 96, 96);
+      const house = new Path2D(LOGO_HOUSE), heart = new Path2D(LOGO_HEART);
+      x.fillStyle = '#EFEAF6'; x.strokeStyle = '#EFEAF6'; x.lineWidth = 6; x.lineJoin = 'round'; x.fill(house); x.stroke(house);
+      const g = x.createLinearGradient(40, 0, 56, 0); g.addColorStop(0, c1); g.addColorStop(1, c2);
+      x.fillStyle = '#2E2540'; x.fill(heart); x.strokeStyle = g; x.lineWidth = 5.5; x.stroke(heart);
+      return cv.toDataURL('image/png');
+    };
+    $('#touchicon').href = draw(180, false); $('#favicon').href = draw(64, true);
+  } catch(e){}
+}
+
 /* ---------- render ---------- */
 let raf = 0;
 function scheduleRender(){ if(raf) return; raf = requestAnimationFrame(() => { raf = 0; render(); }); }
@@ -571,9 +611,9 @@ function render(){
   const status = mode === 'locked' ? ['Locked','warn'] : mode === 'loading' ? ['Loading',''] :
     (inflight || pending.size) ? ['Saving…','warn'] : failed ? ['Offline','warn'] : ['Synced','ok'];
   sync.textContent = status[0]; sync.className = 'sync ' + status[1];
-  const ms0 = mode === 'synced' || mode === 'offline' ? members() : [], root = document.documentElement;
-  ms0[0] ? root.style.setProperty('--m1', ms0[0].color) : root.style.removeProperty('--m1');
-  ms0[1] ? root.style.setProperty('--m2', ms0[1].color) : root.style.removeProperty('--m2');
+  const [h1, h2] = heartColors(), root = document.documentElement;
+  root.style.setProperty('--h1', h1); root.style.setProperty('--h2', h2);
+  liveIcon(h1, h2);
   document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-current', b.dataset.tab === st.tab ? 'page' : 'false'));
 
   const view = $('#view');
@@ -594,6 +634,7 @@ function render(){
 function viewLock(){
   const setup = !/^https:\/\/script\.google/.test(API_URL);
   return `<div class="wrap welcome">
+    ${logoSvg()}
     <h1>Welcome back.</h1>
     <p>${setup ? 'One more setup step: paste your Apps Script link into config.js.' : 'Sign in with your name and passcode.'}</p>
     <div class="card lift" style="max-width:420px">
@@ -605,6 +646,7 @@ function viewLock(){
 }
 function viewWelcome(){
   return `<div class="wrap welcome">
+    ${logoSvg()}
     <h1>One board for the two of you.</h1>
     <p>Plan the week together: a shared calendar, chore charts with stars, a meal plan, and lists that update on both phones.</p>
     <button class="btn" data-act="newMember">Add the first person</button>
@@ -1087,12 +1129,50 @@ function saveMember(){
 }
 
 /* ---------- sheet + toast ---------- */
+let sheetHist = false, skipPop = false;
 function openSheet(html){
-  $('#sheet').innerHTML = `<div class="grab"></div>${html}`;
+  const el = $('#sheet'), wasOpen = !$('#sheetWrap').hidden;
+  el.innerHTML = `<div class="sheet-head"><div class="grab" aria-hidden="true"></div><button class="sheet-x" data-act="closeSheet" aria-label="Close">${icon.x}</button></div>${html}`;
+  const h = el.querySelector(':scope > h2'); if(h) el.querySelector('.sheet-head').insertBefore(h, el.querySelector('.sheet-x'));
+  el.style.transform = ''; el.style.transition = '';
   $('#sheetWrap').hidden = false;
+  if(!wasOpen){
+    el.scrollTop = 0;
+    // so Android's back gesture closes the window instead of leaving the app
+    if(!sheetHist){ try { history.pushState({ tandemSheet: 1 }, ''); sheetHist = true; } catch(e){} }
+  }
   const f = $('#sheet input[type=text]'); if(f && !f.value && window.matchMedia('(pointer:fine)').matches) f.focus();
 }
-function closeSheet(){ $('#sheetWrap').hidden = true; $('#sheet').innerHTML = ''; sheet = null; }
+function closeSheet(fromBack){
+  const el = $('#sheet');
+  $('#sheetWrap').hidden = true; el.innerHTML = ''; el.style.transform = ''; el.style.transition = ''; el.classList.remove('dragging'); sheet = null;
+  if(sheetHist && fromBack !== true){ sheetHist = false; skipPop = true; history.back(); }
+  else sheetHist = false;
+}
+window.addEventListener('popstate', () => {
+  if(skipPop){ skipPop = false; return; }
+  if(!$('#sheetWrap').hidden) closeSheet(true);
+});
+// Swipe the top of a window down to close it
+(() => {
+  const el = $('#sheet'); let drag = null;
+  el.addEventListener('touchstart', e => {
+    if(!e.target.closest('.sheet-head') || e.target.closest('button')) return;
+    drag = { y: e.touches[0].clientY, dy: 0 }; el.classList.add('dragging');
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if(!drag) return;
+    drag.dy = Math.max(0, e.touches[0].clientY - drag.y);
+    el.style.transform = `translateY(${drag.dy}px)`; e.preventDefault();
+  }, { passive: false });
+  const end = () => {
+    if(!drag) return; const dy = drag.dy; drag = null; el.classList.remove('dragging');
+    el.style.transition = 'transform .2s ease';
+    if(dy > 90){ el.style.transform = 'translateY(100%)'; setTimeout(() => { if(!$('#sheetWrap').hidden) closeSheet(); }, 180); }
+    else el.style.transform = '';
+  };
+  el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
+})();
 let toastT;
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
 
