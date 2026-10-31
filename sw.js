@@ -1,6 +1,6 @@
 // Keeps the app's own files on the phone so it opens fast, even on a weak signal.
 // Your board's data always comes fresh from Google, never from this cache.
-const CACHE = 'tandem-v1';
+const CACHE = 'tandem-v3';
 const FILES = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
