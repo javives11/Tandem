@@ -310,6 +310,36 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 #toast{position:fixed;left:50%;bottom:calc(152px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-size:14px;font-weight:700;max-width:min(92vw,440px);transition:.25s;z-index:30;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%)}
 
+/* Countdowns on the Today screen */
+.cds{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;margin:0 -2px 16px;scrollbar-width:none}
+.cds::-webkit-scrollbar{display:none}
+.cd{flex:0 0 auto;min-width:132px;max-width:200px;scroll-snap-align:start;text-align:left;display:flex;flex-direction:column;background:var(--surface);border-radius:22px;padding:12px 14px 13px;box-shadow:var(--shadow)}
+.cd-top{display:flex;align-items:baseline;gap:6px}
+.cd-emo{font-size:22px;line-height:1}
+.cd-num{font-family:var(--font-head);font-size:44px;line-height:.95;font-weight:var(--hw);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.cd-unit{font-size:13px;font-weight:800;color:var(--muted)}
+.cd b{font-size:15px;font-weight:800;line-height:1.25;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd small{font-size:13px;font-weight:700;color:var(--muted)}
+.cd-live{font-family:var(--font-head);font-size:26px;line-height:1.1;font-weight:var(--hw);font-variant-numeric:tabular-nums;margin-top:2px}
+.cd.soon .cd-unit{color:var(--accent)}
+.cd.now{background:var(--accent);color:var(--accent-ink)}
+.cd.now small,.cd.now .cd-unit{color:inherit;opacity:.85}
+.cd.now .cd-num{font-size:34px}
+.state{font-size:13px;font-weight:800;color:var(--muted);flex:none}
+.state.on{color:var(--accent)}
+.cel-ico{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:var(--sunk);font-size:20px;flex:none}
+
+/* Full-screen celebration */
+#party{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:color-mix(in srgb,var(--bg) 62%,transparent);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:pfade .2s ease both}
+#party.out{animation:pfade .25s ease reverse both}
+#party canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.party-card{position:relative;max-width:min(88vw,380px);text-align:center;background:var(--surface);border-radius:28px;padding:22px 24px 24px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);animation:pcard .55s cubic-bezier(.2,1.4,.4,1) both}
+.party-emo{display:block;font-size:46px;line-height:1;margin-bottom:10px}
+.party-card b{display:block;font-family:var(--font-head);font-size:clamp(24px,7vw,30px);line-height:1.15;font-weight:var(--hw)}
+.party-card small{display:block;margin-top:8px;font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes pfade{from{opacity:0}}
+@keyframes pcard{0%{transform:scale(.6) translateY(20px);opacity:0}100%{transform:none;opacity:1}}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .plus1{display:none}
@@ -415,7 +445,8 @@ async function flush(){
 }
 function put(col, id, data){ S[col].set(id, data); queueOp({ op:'set', col, id, data }); }
 function del(col, id){ S[col].delete(id); queueOp({ op:'del', col, id }); }
-const all = col => [...S[col]].map(([id, v]) => ({ id, ...v }));
+// ids starting with "__" are app settings tucked into the rewards tab, never shown as regular items
+const all = col => [...S[col]].filter(([id]) => !String(id).startsWith('__')).map(([id, v]) => ({ id, ...v }));
 
 async function refresh(){
   if(inflight || pending.size){ needRefresh = true; return; }
@@ -424,6 +455,7 @@ async function refresh(){
     if(inflight || pending.size){ needRefresh = true; return; }
     COLS.forEach(c => { S[c] = new Map(Object.entries(r.data[c] || {})); });
     version = r.version; mode = 'synced'; failed = false;
+    setTimeout(checkCountdownDay, 400);
   } catch(e){
     if(isBadSession(e)) return signOut(true);
     if(mode === 'loading') mode = 'offline';
@@ -629,6 +661,7 @@ function render(){
   view.innerHTML = html;
 
   if(keep){ const el = document.getElementById(keep.id); if(el){ el.value = keep.v; el.focus({preventScroll:true}); try{ el.setSelectionRange(keep.s, keep.e); }catch(e){} } }
+  afterRender();
 }
 
 function viewLock(){
@@ -708,7 +741,7 @@ function todayGlance(t){
   const dinner = dn
     ? `<button class="dinner" data-act="editMeal" data-id="${esc(dn.id)}" data-date="${t}"><span class="emo" aria-hidden="true">🍽️</span><span style="flex:1;min-width:0"><b>${esc(dn.name)}</b><small>${cook ? esc(cook.name)+' is cooking' : 'Tonight’s dinner'}</small></span>${cook ? avatar(cook) : ''}</button>`
     : `<button class="dinner none" data-act="newMeal" data-date="${t}"><span class="emo" aria-hidden="true">🍽️</span><span><b>No dinner yet</b><small>Tap to add one</small></span></button>`;
-  return `<div class="day-body">${dayEvents(t)}</div>
+  return `${countdownStrip()}<div class="day-body">${dayEvents(t)}</div>
     <h2 class="section-title">Chores</h2><div class="glance">${pair}</div>
     <h2 class="section-title">Dinner</h2>${dinner}
     <h2 class="section-title">Coming up</h2>`;
@@ -894,7 +927,7 @@ function viewHabits(){
 }
 function habitSheet(id){
   const ms = members();
-  const h = id ? { id, ...S.habits.get(id) } : { title:'', emoji:'', memberId: ms[0]?.id, days:[0,1,2,3,4,5,6] };
+  const h = id ? { id, ...S.habits.get(id) } : { title:'', emoji:'', memberId: ms[0]?.id, days:[parse(st.choreDate).getDay()] };
   sheet = { kind:'habit', id, memberId: h.memberId, days: new Set(h.days||[]) };
   openSheet(`<h2>${id?'Edit habit':'New habit'}</h2>
     <div class="two" style="grid-template-columns:1fr 84px">
@@ -922,6 +955,9 @@ function toggleHabit(id){
   else {
     fx('habit:' + key, 600);
     put('habitDone', key, { date: st.choreDate, habitId: id });
+    const h = S.habits.get(id), m = h && mem(h.memberId);
+    if(h){ const sk = streak(h, st.choreDate);
+      celebrate('habit', { name: m?.name, thing: h.title, color: m?.color, sub: `${h.emoji ? h.emoji + ' ' : ''}${h.title}${sk > 1 ? `, ${sk} day streak` : ''}` }); }
   }
 }
 
@@ -940,11 +976,14 @@ function toggleChore(id, btn){
     fx('chore:' + key, 1000); fx('star:' + c.memberId, 600);
     S.choreDone.set(key, { date: st.choreDate, choreId: id, by: c.memberId, stars: Number(c.stars)||1 });
     put('choreDone', key, S.choreDone.get(key));
+    const m = mem(c.memberId), stars = Number(c.stars)||1;
+    if(allDoneOn(st.choreDate) && celebSet('allChores').on) celebrate('allChores', { name: m?.name, color: m?.color });
+    else celebrate('chore', { name: m?.name, thing: c.title, color: m?.color, sub: `${c.emoji ? c.emoji + ' ' : ''}${c.title}, +${stars} ★` });
   }
 }
 function choreSheet(id){
   const ms = members();
-  const c = id ? { id, ...S.chores.get(id) } : { title:'', emoji:'', memberId: ms[0]?.id, days:[0,1,2,3,4,5,6], stars:1 };
+  const c = id ? { id, ...S.chores.get(id) } : { title:'', emoji:'', memberId: ms[0]?.id, days:[parse(st.choreDate).getDay()], stars:1 };
   sheet = { kind:'chore', id, memberId: c.memberId, days: new Set(c.days||[]) };
   openSheet(`<h2>${id?'Edit chore':'New chore'}</h2>
     <div class="two" style="grid-template-columns:1fr 84px">
@@ -1092,6 +1131,14 @@ function viewFamily(){
     <div class="hero"><div><h1>Family</h1><p>Each of you gets a color that follows you everywhere.</p></div></div>
     <div class="card">${ms.length ? ms.map(m => `<button class="row" data-act="editMember" data-id="${esc(m.id)}">${avatar(m,'lg')}<span class="grow"><b>${esc(m.name)}</b><small>${balance(m.id)} ${balance(m.id)===1?'star':'stars'} saved</small></span><span class="link">Edit</span></button>`).join('') : '<p class="empty" style="margin:4px 0">No one yet.</p>'}
       <button class="btn ghost" style="width:100%;margin-top:10px" data-act="newMember">Add a person</button></div>
+    <div class="section-title">Celebrations</div>
+    <div class="card">${CELEB.map(([k, label]) => { const c = celebSet(k);
+      return `<button class="row" data-act="editCeleb" data-k="${k}"><span class="cel-ico" aria-hidden="true">${EFFECTS[c.effect].emo}</span><span class="grow">${label}<small>${c.on ? esc(c.msg) : 'No celebration'}</small></span><span class="state ${c.on?'on':''}">${c.on?'On':'Off'}</span></button>`; }).join('')}
+      <p class="note" style="margin:10px 0 0">Shared by both phones. A celebration shows on the phone that checked the thing off.</p></div>
+    <div class="section-title">Countdowns<button class="link" data-act="newCountdown">+ Add countdown</button></div>
+    <div class="card">${countdowns().length ? countdowns().map(cd => { const n = cdDays(cd);
+      return `<button class="row" data-act="editCountdown" data-id="${esc(cd.id)}"><span class="cel-ico" aria-hidden="true">${esc(cd.emoji || '⏳')}</span><span class="grow">${esc(cd.title)}<small>${niceDate(cdNext(cd))}${cd.yearly ? ', every year' : ''}</small></span><span class="state ${n >= 0 ? 'on' : ''}">${n < 0 ? 'Passed' : n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n + ' days'}</span></button>`; }).join('')
+      : '<p class="empty" style="margin:4px 0">Count down to a trip, a birthday, or anything you’re looking forward to. Countdowns show at the top of the Today screen.</p>'}</div>
     <div class="section-title">Look</div>
     <div class="card">${lookPicker()}<p class="note" style="margin:10px 0 0">Your choice is saved on this phone only, so you can each pick your own.</p></div>
     <div class="section-title">Sharing</div>
@@ -1125,6 +1172,173 @@ function saveMember(){
     put('lists', uid(), { name:'Groceries', emoji:'🛒', order:1 });
     put('lists', uid(), { name:'To-do', emoji:'✅', order:2 });
   }
+  closeSheet();
+}
+
+/* ---------- Celebrations + countdowns (shared settings) ----------
+   Stored as special rows in the rewards tab of your Sheet (ids start with "__"),
+   so no change to the Apps Script code is needed. */
+const SET_ID = '__settings', CD_PREFIX = '__cd_';
+const EFFECTS = { confetti:{ name:'Confetti', emo:'🎉' }, stars:{ name:'Stars', emo:'⭐' }, hearts:{ name:'Hearts', emo:'💖' } };
+// [key, label in settings, on by default, default message, default animation, help text]
+const CELEB = [
+  ['chore', 'A chore is done', true, 'Nice work, {name}!', 'confetti', '{name} is whose chore it is. {thing} is the chore.'],
+  ['allChores', 'Every chore for the day is done', true, 'All done for today. Nice teamwork!', 'stars', '{name} is whoever finished the last chore. This shows instead of the single chore one.'],
+  ['habit', 'A habit is checked off', true, '{name} kept it going!', 'stars', '{name} is whose habit it is. {thing} is the habit.'],
+  ['item', 'A list item is checked off', false, 'Checked off!', 'confetti', '{name} is who the item is assigned to. {thing} is the item.'],
+  ['listDone', 'A whole list is finished', true, '{thing} is all done!', 'confetti', '{thing} is the list name. This shows instead of the single item one.'],
+  ['reward', 'A reward is redeemed', true, 'Enjoy it, {name}!', 'hearts', '{name} is who cashed in. {thing} is the reward.']
+];
+const settings = () => S.rewards.get(SET_ID) || {};
+function celebSet(k){
+  const d = CELEB.find(x => x[0] === k), s = (settings().celebrate || {})[k] || {};
+  return { on: s.on ?? d[2], msg: s.msg || d[3], effect: EFFECTS[s.effect] ? s.effect : d[4] };
+}
+function fillMsg(msg, ctx){
+  return String(msg).replace(/\{name\}/gi, ctx.name || ME || 'you').replace(/\{thing\}/gi, ctx.thing || '').replace(/\s+([!.,?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+}
+const reducedMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+function celebrate(k, ctx = {}){
+  const c = celebSet(k); if(!c.on) return;
+  setTimeout(() => party(fillMsg(c.msg, ctx), ctx.sub || '', c.effect, ctx.color), 280);
+}
+let partyT = 0, partyRaf = 0;
+function party(msg, sub, effect, color){
+  closeParty(true);
+  const el = document.createElement('div'); el.id = 'party'; el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'assertive');
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="party-card"><span class="party-emo" aria-hidden="true">${EFFECTS[effect]?.emo || '🎉'}</span><b>${esc(msg)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
+  el.addEventListener('click', () => closeParty());
+  document.body.appendChild(el);
+  if(!reducedMQ.matches) burst(el.querySelector('canvas'), effect, color);
+  partyT = setTimeout(closeParty, 2800);
+}
+function closeParty(now){
+  clearTimeout(partyT); cancelAnimationFrame(partyRaf);
+  const el = $('#party'); if(!el) return;
+  if(now === true || reducedMQ.matches){ el.remove(); return; }
+  el.id = ''; el.classList.add('out'); setTimeout(() => el.remove(), 240);
+}
+function burst(cv, effect, color){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr; const x = cv.getContext('2d'); x.scale(dpr, dpr);
+  const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim();
+  const pal = [color, v('--accent'), v('--star'), v('--h1'), v('--h2'), ...members().map(m => m.color)].filter(Boolean);
+  const pick = () => pal[Math.floor(Math.random() * pal.length)], R = (a, b) => a + Math.random() * (b - a);
+  const P = [];
+  if(effect === 'stars'){ // a burst from the middle of the screen
+    for(let i = 0; i < 70; i++){ const a = R(0, Math.PI * 2), sp = R(3, 11);
+      P.push({ x: W/2, y: H/2, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 2, r: R(6, 13), rot: R(0, 6), vr: R(-.15, .15), c: pick(), g: .14, drag: .965 }); }
+  } else if(effect === 'hearts'){ // hearts drifting up from the bottom
+    for(let i = 0; i < 46; i++) P.push({ x: R(0, W), y: H + R(10, 260), vx: 0, vy: R(-5.5, -3), r: R(8, 16), rot: R(-.3, .3), vr: 0, c: pick(), g: -.01, drag: 1, sway: R(0, 6), sw: R(.6, 1.6) });
+  } else { // confetti cannons from both bottom corners
+    for(let i = 0; i < 130; i++){ const left = i % 2 === 0, a = left ? R(-1.35, -.75) : R(-2.4, -1.8), sp = R(11, 21);
+      P.push({ x: left ? -10 : W + 10, y: H * .92, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, w: R(6, 11), h: R(9, 16), rot: R(0, 6), vr: R(-.3, .3), c: pick(), g: .32, drag: .975, flip: R(0, 6) }); }
+  }
+  const star = (r) => { x.beginPath(); for(let i = 0; i < 10; i++){ const rr = i % 2 ? r * .45 : r, a = i * Math.PI / 5 - Math.PI / 2; x.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } x.closePath(); x.fill(); };
+  const heart = (r) => { x.beginPath(); x.moveTo(0, r*.35); x.bezierCurveTo(-r*1.1, -r*.35, -r*.45, -r*1.05, 0, -r*.4); x.bezierCurveTo(r*.45, -r*1.05, r*1.1, -r*.35, 0, r*.35); x.fill(); };
+  const t0 = performance.now(), DUR = 2500;
+  const tick = now => {
+    const e = now - t0; x.clearRect(0, 0, W, H);
+    x.globalAlpha = e > DUR - 500 ? Math.max(0, (DUR - e) / 500) : 1;
+    P.forEach(p => {
+      p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx + (p.sway !== undefined ? Math.sin(e / 300 * p.sw + p.sway) * .8 : 0); p.y += p.vy; p.rot += p.vr;
+      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.fillStyle = p.c;
+      if(effect === 'stars') star(p.r); else if(effect === 'hearts') heart(p.r);
+      else { x.scale(1, Math.cos(e / 120 + p.flip)); x.fillRect(-p.w/2, -p.h/2, p.w, p.h); }
+      x.restore();
+    });
+    if(e < DUR) partyRaf = requestAnimationFrame(tick); else x.clearRect(0, 0, W, H);
+  };
+  partyRaf = requestAnimationFrame(tick);
+}
+function celebSheet(k){
+  const d = CELEB.find(x => x[0] === k), c = celebSet(k);
+  sheet = { kind:'celeb', k, effect: c.effect };
+  openSheet(`<h2>Celebration<small>${d[1]}</small></h2>
+    <label class="toggle">Show a celebration<input type="checkbox" id="f-on" ${c.on?'checked':''}></label>
+    <label class="field"><span>What the screen says</span><input type="text" id="f-msg" value="${esc(c.msg)}" placeholder="${esc(d[3])}" maxlength="80"></label>
+    <p class="note">${esc(d[5])}</p>
+    <div class="field"><span>Animation</span><div class="seg mealtype">${Object.entries(EFFECTS).map(([e, x]) => `<button data-act="pickEffect" data-e="${e}" aria-pressed="${c.effect===e}">${x.emo} ${x.name}</button>`).join('')}</div></div>
+    <div class="actions"><button class="btn ghost" data-act="previewCeleb">Preview</button><button class="btn" data-act="saveCeleb">Save</button></div>`);
+}
+function saveCeleb(){
+  const d = CELEB.find(x => x[0] === sheet.k), prev = settings();
+  const msg = $('#f-msg').value.trim() || d[3];
+  put('rewards', SET_ID, { ...prev, celebrate: { ...(prev.celebrate || {}), [sheet.k]: { on: $('#f-on').checked, msg, effect: sheet.effect } } });
+  closeSheet();
+}
+const SAMPLE = { chore:'Feed the dog', habit:'Read for 20 minutes', item:'Milk', listDone:'Groceries', reward:'Movie night' };
+function previewCeleb(){
+  const d = CELEB.find(x => x[0] === sheet.k), m = members()[0];
+  party(fillMsg($('#f-msg').value.trim() || d[3], { name: m?.name, thing: SAMPLE[sheet.k] }), SAMPLE[sheet.k] || '', sheet.effect, m?.color);
+}
+
+/* Countdowns */
+const countdowns = () => [...S.rewards].filter(([id]) => String(id).startsWith(CD_PREFIX)).map(([id, v]) => ({ id, ...v }))
+  .sort((a, b) => { const na = cdDays(a), nb = cdDays(b); return (na < 0) - (nb < 0) || (na < 0 ? nb - na : na - nb); });
+function cdNext(cd){
+  const t = today(); if(!cd.yearly || cd.date >= t) return cd.date;
+  const [, m, d] = cd.date.split('-').map(Number), y = parse(t).getFullYear();
+  let nx = ymd(new Date(y, m - 1, d)); if(nx < t) nx = ymd(new Date(y + 1, m - 1, d));
+  return nx;
+}
+const cdDays = cd => Math.round((parse(cdNext(cd)) - parse(today())) / 864e5);
+function cdLeft(date){
+  const ms = Math.max(0, parse(date) - Date.now()), s = Math.floor(ms / 1000);
+  return `${Math.floor(s / 3600)}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
+}
+function countdownStrip(){
+  const live = countdowns().filter(cd => cdDays(cd) >= 0); if(!live.length) return '';
+  return `<div class="cds">${live.map(cd => { const n = cdDays(cd), emo = cd.emoji ? `<span class="cd-emo" aria-hidden="true">${esc(cd.emoji)}</span>` : '';
+    if(n === 0) return `<button class="cd now" data-act="editCountdown" data-id="${esc(cd.id)}"><span class="cd-top">${emo}<span class="cd-num">Today</span></span><b>${esc(cd.title)}</b><small>It’s here</small></button>`;
+    if(n === 1) return `<button class="cd soon" data-act="editCountdown" data-id="${esc(cd.id)}"><span class="cd-top">${emo}<span class="cd-unit">Tomorrow</span></span><span class="cd-live" data-until="${cdNext(cd)}">${cdLeft(cdNext(cd))}</span><b>${esc(cd.title)}</b><small>to go</small></button>`;
+    return `<button class="cd ${n <= 7 ? 'soon' : ''}" data-act="editCountdown" data-id="${esc(cd.id)}" aria-label="${n} days until ${esc(cd.title)}"><span class="cd-top">${emo}<span class="cd-num" data-n="${n}">${n}</span><span class="cd-unit">days</span></span><b>${esc(cd.title)}</b><small>${niceDate(cdNext(cd))}</small></button>`; }).join('')}</div>`;
+}
+// The day counts roll up once a day when the Today screen first shows; "tomorrow" ones tick down live.
+let cdRolled = '';
+function afterRender(){
+  const nums = document.querySelectorAll('.cd-num[data-n]');
+  if(!nums.length || cdRolled === today()) return;
+  cdRolled = today(); if(reducedMQ.matches) return;
+  const t0 = performance.now(), DUR = 1100;
+  const step = now => { const k = Math.min(1, (now - t0) / DUR), ease = 1 - Math.pow(1 - k, 3);
+    nums.forEach(el => { if(el.isConnected) el.textContent = Math.round(Number(el.dataset.n) * ease); });
+    if(k < 1) requestAnimationFrame(step); };
+  nums.forEach(el => el.textContent = '0'); requestAnimationFrame(step);
+}
+setInterval(() => document.querySelectorAll('[data-until]').forEach(el => {
+  if(parse(el.dataset.until) - Date.now() <= 0) scheduleRender(); else el.textContent = cdLeft(el.dataset.until);
+}), 1000);
+function checkCountdownDay(){
+  if(mode !== 'synced' && mode !== 'offline') return;
+  const t = today(), due = countdowns().find(cd => cdDays(cd) === 0 && cd.party !== false && !localStorage.getItem('tandem-cd-' + cd.id + '-' + t));
+  if(!due) return;
+  try { localStorage.setItem('tandem-cd-' + due.id + '-' + t, '1'); } catch(e){}
+  party(fillMsg(due.msg || '{thing} is today!', { thing: due.title }), due.emoji ? `${due.emoji} ${due.title}` : due.title, due.effect || 'confetti');
+}
+function countdownSheet(id){
+  const cd = id ? { id, ...S.rewards.get(id) } : { title:'', emoji:'', date: addDays(today(), 7), yearly:false, party:true, msg:'', effect:'confetti' };
+  sheet = { kind:'countdown', id, effect: EFFECTS[cd.effect] ? cd.effect : 'confetti' };
+  openSheet(`<h2>${id?'Edit countdown':'New countdown'}</h2>
+    <div class="two" style="grid-template-columns:1fr 84px">
+      <label class="field"><span>Counting down to</span><input type="text" id="f-title" value="${esc(cd.title)}" placeholder="Beach trip" maxlength="40"></label>
+      <label class="field"><span>Emoji</span><input type="text" id="f-emoji" value="${esc(cd.emoji||'')}" placeholder="🏖️" maxlength="4"></label>
+    </div>
+    <label class="field"><span>Date</span><input type="date" id="f-date" value="${esc(cd.date)}"></label>
+    <label class="toggle">Repeats every year<input type="checkbox" id="f-yearly" ${cd.yearly?'checked':''}></label>
+    <label class="toggle">Celebrate full screen on the day<input type="checkbox" id="f-party" ${cd.party!==false?'checked':''}></label>
+    <label class="field"><span>What the screen says on the day</span><input type="text" id="f-msg" value="${esc(cd.msg||'')}" placeholder="{thing} is today!" maxlength="80"></label>
+    <p class="note">{thing} is the countdown name. It shows once on each phone, the first time the app opens that day.</p>
+    <div class="field"><span>Animation</span><div class="seg mealtype">${Object.entries(EFFECTS).map(([e, x]) => `<button data-act="pickEffect" data-e="${e}" aria-pressed="${sheet.effect===e}">${x.emo} ${x.name}</button>`).join('')}</div></div>
+    <div class="actions">${id?'<button class="btn danger" data-act="delCountdown">Delete</button>':''}<button class="btn ghost" data-act="previewCountdown">Preview</button><button class="btn" data-act="saveCountdown">Save</button></div>`);
+}
+function saveCountdown(){
+  const title = $('#f-title').value.trim(), date = $('#f-date').value;
+  if(!title){ toast('Name the countdown.'); $('#f-title').focus(); return; }
+  if(!date){ toast('Pick a date.'); return; }
+  const yearly = $('#f-yearly').checked;
+  if(!yearly && date < today()){ toast('Pick a date that hasn’t passed, or turn on Repeats every year.'); return; }
+  put('rewards', sheet.id || CD_PREFIX + uid(), { title, emoji: $('#f-emoji').value.trim(), date, yearly, party: $('#f-party').checked, msg: $('#f-msg').value.trim(), effect: sheet.effect });
   closeSheet();
 }
 
@@ -1178,7 +1392,8 @@ function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add
 
 /* ---------- events ---------- */
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape' && sheet) closeSheet();
+  if(e.key === 'Escape' && $('#party')) closeParty();
+  else if(e.key === 'Escape' && sheet) closeSheet();
   if(e.key === 'Enter' && e.target.id === 'newItem'){ e.preventDefault(); addItem(); }
   if(e.key === 'Enter' && e.target.id === 'passIn'){ e.preventDefault(); unlock(); }
   if(e.key === 'Enter' && e.target.id === 'userIn'){ e.preventDefault(); $('#passIn')?.focus(); }
@@ -1239,7 +1454,10 @@ document.addEventListener('click', e => {
     case 'redeem': {
       const r = S.rewards.get(sheet.id), m = mem(id);
       put('redemptions', uid(), { rewardId: sheet.id, title: r.title, memberId: id, cost: Number(r.cost)||0, date: today() });
-      closeSheet(); toast(`${m.name} redeemed ${r.title}. Enjoy!`); break; }
+      closeSheet();
+      if(celebSet('reward').on) celebrate('reward', { name: m.name, thing: r.title, color: m.color, sub: `${r.emoji ? r.emoji + ' ' : ''}${r.title}` });
+      else toast(`${m.name} redeemed ${r.title}. Enjoy!`);
+      break; }
     // meals
     case 'mealWeek': st.mealWeek = fromToday(addDays(fromToday(st.mealWeek), Number(b.dataset.n))); render(); break;
     case 'mealThisWeek': st.mealWeek = today(); render(); break;
@@ -1262,13 +1480,32 @@ document.addEventListener('click', e => {
     case 'delList': if(armed(b)){
       const lid = sheet.id; all('items').filter(i => i.listId === lid).forEach(i => del('items', i.id)); del('lists', lid); st.listId = null; closeSheet(); } break;
     case 'addItem': addItem(); break;
-    case 'toggleItem': { const i = S.items.get(id); if(i){ if(!i.done) fx('item:' + id, 500); put('items', id, { ...i, done: !i.done, doneAt: !i.done ? Date.now() : null }); } break; }
+    case 'toggleItem': { const i = S.items.get(id); if(!i) break;
+      const nowDone = !i.done; if(nowDone) fx('item:' + id, 500);
+      put('items', id, { ...i, done: nowDone, doneAt: nowDone ? Date.now() : null });
+      if(nowDone){
+        const w = i.who ? mem(i.who) : null, L = S.lists.get(i.listId);
+        const left = all('items').filter(x => x.listId === i.listId && !x.done).length;
+        if(!left && L && celebSet('listDone').on) celebrate('listDone', { name: w?.name, thing: L.name, color: w?.color, sub: `${L.emoji ? L.emoji + ' ' : ''}${L.name}` });
+        else celebrate('item', { name: w?.name, thing: i.text, color: w?.color, sub: i.text });
+      }
+      break; }
     case 'cycleWho': { const ids = [null, ...members().map(m => m.id)]; st.itemWho = ids[(ids.indexOf(st.itemWho) + 1) % ids.length]; render(); break; }
     case 'itemWho': { const i = S.items.get(id); if(!i) break; const ids = [null, ...members().map(m => m.id)]; const nx = ids[(ids.indexOf(i.who || null) + 1) % ids.length];
       const copy = { ...i }; if(nx) copy.who = nx; else delete copy.who; put('items', id, copy); break; }
     case 'delItem': del('items', id); break;
     case 'clearDone': all('items').filter(i => i.listId === st.listId && i.done).forEach(i => del('items', i.id)); break;
     // family
+    case 'editCeleb': celebSheet(b.dataset.k); break;
+    case 'pickEffect': sheet.effect = b.dataset.e; b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); break;
+    case 'previewCeleb': previewCeleb(); break;
+    case 'saveCeleb': saveCeleb(); break;
+    case 'newCountdown': countdownSheet(); break;
+    case 'editCountdown': countdownSheet(id); break;
+    case 'saveCountdown': saveCountdown(); break;
+    case 'previewCountdown': { const title = $('#f-title').value.trim() || 'Beach trip', emo = $('#f-emoji').value.trim();
+      party(fillMsg($('#f-msg').value.trim() || '{thing} is today!', { thing: title }), emo ? `${emo} ${title}` : title, sheet.effect); break; }
+    case 'delCountdown': if(armed(b)){ del('rewards', sheet.id); closeSheet(); } break;
     case 'newMember': memberSheet(); break;
     case 'editMember': memberSheet(id); break;
     case 'pickColor': sheet.color = b.dataset.c; b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); break;
