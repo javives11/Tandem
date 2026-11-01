@@ -340,6 +340,18 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 @keyframes pfade{from{opacity:0}}
 @keyframes pcard{0%{transform:scale(.6) translateY(20px);opacity:0}100%{transform:none;opacity:1}}
 
+/* Notification settings */
+.nopt{display:flex;align-items:center;gap:10px;min-height:54px;padding:6px 0;border-top:1.5px solid var(--line);font-weight:700}
+.nopt:first-of-type{border-top:0}
+.nopt .grow{flex:1;min-width:0;line-height:1.3}
+.nopt .grow small{display:block;font-size:13px;font-weight:600;color:var(--muted)}
+.nopt input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);flex:none}
+.nopt input[type=time],.nopt select{min-height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);padding:6px 8px;font-size:15px;font-weight:700;flex:none}
+.ngroup{background:var(--bg);border-radius:18px;padding:4px 14px;margin-bottom:18px}
+.nhead{font-size:14px;font-weight:800;color:var(--muted);margin:0 0 6px}
+.nbtns{display:flex;gap:10px;margin-top:10px}
+.nbtns .btn{min-height:46px;font-size:15px}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .plus1{display:none}
@@ -456,6 +468,7 @@ async function refresh(){
     COLS.forEach(c => { S[c] = new Map(Object.entries(r.data[c] || {})); });
     version = r.version; mode = 'synced'; failed = false;
     setTimeout(checkCountdownDay, 400);
+    checkPush();
   } catch(e){
     if(isBadSession(e)) return signOut(true);
     if(mode === 'loading') mode = 'offline';
@@ -470,6 +483,7 @@ async function poll(){
   catch(e){ if(isBadSession(e)) signOut(true); else { failed = true; render(); } }
 }
 function signOut(expired){
+  pushOff(!expired);
   if(TOKEN && !expired) api('logout').catch(() => {});
   TOKEN = ''; ME = ''; try { localStorage.removeItem(TKEY); } catch(e){}
   COLS.forEach(c => S[c] = new Map()); pending.clear(); version = -1;
@@ -481,7 +495,7 @@ function boot(){
   else refresh();
   setInterval(poll, 12000);
   document.addEventListener('visibilitychange', () => { if(!document.hidden) poll(); });
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(() => checkPush()).catch(() => {});
 }
 let signingIn = false;
 async function unlock(){
@@ -493,7 +507,7 @@ async function unlock(){
     const r = await api('login', { user, pass });
     TOKEN = r.token; ME = r.name;
     try { localStorage.setItem(TKEY, JSON.stringify({ token: TOKEN, name: ME })); } catch(e){}
-    mode = 'loading'; signingIn = false; render(); refresh();
+    mode = 'loading'; signingIn = false; pushSynced = false; render(); refresh();
   } catch(e){
     signingIn = false; if(btn){ btn.disabled = false; btn.textContent = 'Sign in'; }
     const msg = {
@@ -1139,6 +1153,8 @@ function viewFamily(){
     <div class="card">${countdowns().length ? countdowns().map(cd => { const n = cdDays(cd);
       return `<button class="row" data-act="editCountdown" data-id="${esc(cd.id)}"><span class="cel-ico" aria-hidden="true">${esc(cd.emoji || '⏳')}</span><span class="grow">${esc(cd.title)}<small>${niceDate(cdNext(cd))}${cd.yearly ? ', every year' : ''}</small></span><span class="state ${n >= 0 ? 'on' : ''}">${n < 0 ? 'Passed' : n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n + ' days'}</span></button>`; }).join('')
       : '<p class="empty" style="margin:4px 0">Count down to a trip, a birthday, or anything you’re looking forward to. Countdowns show at the top of the Today screen.</p>'}</div>
+    <div class="section-title">Notifications</div>
+    <div class="card">${notifCard()}</div>
     <div class="section-title">Look</div>
     <div class="card">${lookPicker()}<p class="note" style="margin:10px 0 0">Your choice is saved on this phone only, so you can each pick your own.</p></div>
     <div class="section-title">Sharing</div>
@@ -1342,6 +1358,143 @@ function saveCountdown(){
   closeSheet();
 }
 
+/* ---------- Notifications ----------
+   The server wakes the phone; the phone's helper (sw.js) then asks the server what to show.
+   It needs this phone's sign-in, so a copy is kept where the helper can read it. */
+const TABS = ['cal','chores','meals','lists','family'];
+let pushState = 'checking', pushSynced = false;
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = () => navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+async function saveMeta(resetSince){
+  if(!('caches' in window)) return;
+  try {
+    const c = await caches.open('tandem-meta');
+    await c.put('session', new Response(JSON.stringify({ token: TOKEN, url: API_URL })));
+    if(resetSince) await c.put('since', new Response(String(Date.now())));
+  } catch(e){}
+}
+function b64ToBytes(s){ const b = atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+async function getSub(){
+  if(!('serviceWorker' in navigator)) return null;
+  const reg = await navigator.serviceWorker.getRegistration(); if(!reg || !reg.pushManager) return null;
+  return reg.pushManager.getSubscription();
+}
+async function checkPush(){
+  let s;
+  if(isIOS() && !isStandalone()) s = 'ios-browser';
+  else if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) s = 'unsupported';
+  else if(Notification.permission === 'denied') s = 'denied';
+  else {
+    const sub = await getSub().catch(() => null);
+    s = sub && Notification.permission === 'granted' ? 'on' : 'off';
+    if(s === 'on' && TOKEN && !pushSynced){ // keep the server's list of phones current after each sign-in
+      pushSynced = true; saveMeta(); api('subscribe', { sub: sub.toJSON() }).catch(() => { pushSynced = false; });
+    }
+  }
+  if(s !== pushState){ pushState = s; if(st.tab === 'family') render(); }
+}
+function pushErr(e){
+  toast(e && e.code === 'UNKNOWN_ACTION' ? 'The server code needs updating first. Follow the Code.gs steps.'
+    : e && e.code === 'NETWORK' ? 'Can’t reach the server. Check your connection.' : 'Something went wrong. Try again.');
+}
+async function enablePush(btn){
+  if(btn){ btn.disabled = true; btn.textContent = 'Turning on…'; }
+  try {
+    const perm = await Notification.requestPermission(); // must come first, straight from the tap
+    if(perm !== 'granted'){ pushState = perm === 'denied' ? 'denied' : 'off'; render(); return; }
+    const { key } = await api('pushKey');
+    const reg = await navigator.serviceWorker.ready, opts = { userVisibleOnly: true, applicationServerKey: b64ToBytes(key) };
+    let sub;
+    try { sub = await reg.pushManager.subscribe(opts); }
+    catch(e){ const old = await reg.pushManager.getSubscription(); if(!old) throw e; await old.unsubscribe(); sub = await reg.pushManager.subscribe(opts); }
+    await saveMeta(true);
+    await api('subscribe', { sub: sub.toJSON() });
+    pushSynced = true; pushState = 'on'; render();
+    toast('Notifications are on for this phone.');
+  } catch(e){
+    if(btn && btn.isConnected){ btn.disabled = false; btn.textContent = 'Turn on notifications'; }
+    pushErr(e);
+  }
+}
+async function pushOff(tellServer){
+  try {
+    const sub = await getSub();
+    if(sub){ if(tellServer && TOKEN) api('unsubscribe', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+    if('caches' in window) await caches.delete('tandem-meta');
+  } catch(e){}
+  pushSynced = false;
+}
+function notifCard(){
+  const prefsRow = `<button class="row" data-act="notifPrefs"><span class="cel-ico" aria-hidden="true">🔔</span><span class="grow">Choose what to get<small>Your choices apply to all your phones</small></span><span class="link">Edit</span></button>`;
+  const msg = {
+    checking: '<p class="empty" style="margin:4px 0">Checking this phone…</p>',
+    'ios-browser': '<p class="empty" style="margin:4px 0">On iPhone, notifications only work in the home screen app. Open Tandem from its icon, then turn them on here.</p>',
+    unsupported: '<p class="empty" style="margin:4px 0">This browser can’t show notifications. Try Chrome on Android or the home screen app on iPhone.</p>',
+    denied: '<p class="empty" style="margin:4px 0">Notifications are blocked for Tandem on this phone. Allow them in your phone’s settings for this app, then come back.</p>',
+    off: `<p class="empty" style="margin:4px 0">Get a heads-up when the other person adds an event or something to a list, plus reminders you pick.</p><button class="btn" style="width:100%;margin-top:10px" data-act="pushOn">Turn on notifications</button>`,
+    on: `<p style="margin:4px 0;font-weight:700">On for this phone.</p><div class="nbtns"><button class="btn ghost" data-act="pushTest">Send a test</button><button class="btn ghost" data-act="pushOff">Turn off</button></div>`
+  }[pushState];
+  return msg + `<div style="margin-top:12px">${prefsRow}</div>`;
+}
+async function notifSheet(){
+  sheet = { kind:'notif', loading: true };
+  openSheet(`<h2>Notifications</h2><p class="empty">Loading your settings…</p>`);
+  let p;
+  try { p = (await api('getPrefs')).prefs; }
+  catch(e){ if(sheet && sheet.kind === 'notif') closeSheet(); return pushErr(e); }
+  if(!sheet || sheet.kind !== 'notif') return;
+  const ms = members(), mine = ms.find(m => (m.name || '').trim().toLowerCase() === (ME || '').toLowerCase());
+  sheet = { kind:'notif', memberId: (p.memberId && S.members.has(p.memberId)) ? p.memberId : (mine ? mine.id : '') };
+  const chk = (k) => `<input type="checkbox" id="n-${k}" ${p[k] ? 'checked' : ''}>`;
+  const time = (k) => `<input type="time" id="n-${k}" value="${esc(p[k])}">`;
+  const row = (k, label, extra = '', sub = '') => `<label class="nopt"><span class="grow">${label}${sub ? `<small>${sub}</small>` : ''}</span>${extra}${chk(k)}</label>`;
+  const leads = [[10,'10 min'],[15,'15 min'],[30,'30 min'],[60,'1 hour'],[120,'2 hours']];
+  openSheet(`<h2>Notifications<small>For ${esc(ME)}, on all your phones</small></h2>
+    <p class="nhead">When the other person…</p>
+    <div class="ngroup">
+      ${row('events', 'Adds or changes an event')}
+      ${row('items', 'Adds to a list')}
+      ${row('chores', 'Finishes a chore')}
+      ${row('rewards', 'Cashes in a reward')}
+      ${row('meals', 'Plans a meal')}
+    </div>
+    <p class="nhead">Reminders for you</p>
+    <div class="ngroup">
+      ${row('remind', 'Before your events', `<select id="n-lead" aria-label="How long before">${leads.map(([v, l]) => `<option value="${v}" ${Number(p.lead) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`)}
+      ${row('choreRemind', 'Chores not done yet', time('choreTime'))}
+      ${row('habitRemind', 'Habits not done yet', time('habitTime'))}
+      ${row('morning', 'Morning summary of your day')}
+      ${row('countdowns', 'Countdowns', '', 'The day before and the day of')}
+      <label class="nopt"><span class="grow">Morning notifications at</span>${time('morningTime')}</label>
+    </div>
+    <p class="nhead">Quiet hours</p>
+    <div class="ngroup">
+      ${row('quiet', 'Hold off overnight', '', 'No event reminders or updates from the other person')}
+      <label class="nopt"><span class="grow">From</span>${time('quietFrom')}</label>
+      <label class="nopt"><span class="grow">Until</span>${time('quietTo')}</label>
+    </div>
+    ${ms.length ? `<div class="field"><span>Which person are you on the board?</span><div class="chips">${ms.map(m => `<button class="chip ${sheet.memberId === m.id ? 'on' : ''}" style="--c:${esc(m.color)}" data-act="pickMe" data-id="${esc(m.id)}" aria-pressed="${sheet.memberId === m.id}">${avatar(m)}${esc(m.name)}</button>`).join('')}</div></div>
+      <p class="note">Reminders are about your chores, habits, and events.</p>` : ''}
+    <div class="actions"><button class="btn ghost" data-act="closeSheet">Cancel</button><button class="btn" data-act="saveNotif">Save</button></div>`);
+}
+async function saveNotif(){
+  const v = id => $('#n-' + id), p = { memberId: sheet.memberId || '' };
+  ['events','items','chores','rewards','meals','remind','choreRemind','habitRemind','morning','countdowns','quiet'].forEach(k => p[k] = v(k).checked);
+  ['choreTime','habitTime','morningTime','quietFrom','quietTo'].forEach(k => p[k] = v(k).value);
+  p.lead = Number(v('lead').value);
+  const btn = $('[data-act="saveNotif"]'); if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try { await api('setPrefs', { prefs: p }); closeSheet(); toast(pushState === 'on' ? 'Saved.' : 'Saved. Turn on notifications on this phone to get them here.'); }
+  catch(e){ if(btn){ btn.disabled = false; btn.textContent = 'Save'; } pushErr(e); }
+}
+// Tapping a notification opens the right tab
+(() => {
+  const h = location.hash.slice(1);
+  if(TABS.includes(h)){ st.tab = h; try { history.replaceState(null, '', location.pathname + location.search); } catch(e){} }
+  if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => {
+    const t = e.data && e.data.tab; if(TABS.includes(t)){ if(sheet) closeSheet(); st.tab = t; window.scrollTo(0,0); render(); poll(); }
+  });
+})();
+
 /* ---------- sheet + toast ---------- */
 let sheetHist = false, skipPop = false;
 function openSheet(html){
@@ -1400,7 +1553,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('click', e => {
   const tabBtn = e.target.closest('[data-tab]');
-  if(tabBtn){ st.tab = tabBtn.dataset.tab; window.scrollTo(0,0); render(); return; }
+  if(tabBtn){ st.tab = tabBtn.dataset.tab; window.scrollTo(0,0); render(); if(st.tab === 'family') checkPush(); return; }
   const b = e.target.closest('[data-act]'); if(!b) return;
   const { act, id } = b.dataset;
   switch(act){
@@ -1506,6 +1659,12 @@ document.addEventListener('click', e => {
     case 'previewCountdown': { const title = $('#f-title').value.trim() || 'Beach trip', emo = $('#f-emoji').value.trim();
       party(fillMsg($('#f-msg').value.trim() || '{thing} is today!', { thing: title }), emo ? `${emo} ${title}` : title, sheet.effect); break; }
     case 'delCountdown': if(armed(b)){ del('rewards', sheet.id); closeSheet(); } break;
+    case 'pushOn': enablePush(b); break;
+    case 'pushOff': if(armed(b)){ pushOff(true).then(() => { pushState = 'off'; render(); toast('Notifications are off for this phone.'); }); } break;
+    case 'pushTest': api('testPush').then(() => toast('Sent. It should arrive in a few seconds.')).catch(pushErr); break;
+    case 'notifPrefs': notifSheet(); break;
+    case 'saveNotif': saveNotif(); break;
+    case 'pickMe': sheet.memberId = id; b.parentElement.querySelectorAll('.chip').forEach(c => { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', c === b); }); break;
     case 'newMember': memberSheet(); break;
     case 'editMember': memberSheet(id); break;
     case 'pickColor': sheet.color = b.dataset.c; b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); break;
