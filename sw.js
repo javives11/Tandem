@@ -1,8 +1,8 @@
 // Keeps the app's own files on the phone so it opens fast, even on a weak signal.
 // Your board's data always comes fresh from Google, never from this cache.
 // It also shows notifications: the server wakes it up, then it asks the server what to show.
-const CACHE = 'tandem-v8', META = 'tandem-meta';
-const FILES = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/tandem-192.png', 'icons/tandem-512.png', 'icons/tandem-touch-180.png'];
+const CACHE = 'tandem-v9', META = 'tandem-meta';
+const FILES = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/tandem-192.png', 'icons/tandem-512.png', 'icons/tandem-touch-180.png', 'icons/tandem-badge-96.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -28,7 +28,9 @@ async function readMeta(key) {
   try { const c = await caches.open(META); const r = await c.match(key); return r ? await r.text() : null; } catch (e) { return null; }
 }
 async function showNew() {
-  const icon = 'icons/tandem-192.png';
+  // icon: the full-color logo shown beside the message. badge: the small status-bar icon,
+  // which Android draws from the shape alone, so it's a white silhouette on a clear background.
+  const icon = 'icons/tandem-192.png', badge = 'icons/tandem-badge-96.png';
   let items = [];
   try {
     const session = JSON.parse(await readMeta('session') || 'null');
@@ -43,8 +45,8 @@ async function showNew() {
       }
     }
   } catch (e) {}
-  if (!items.length) return self.registration.showNotification('Tandem', { body: 'Open Tandem to see what’s new.', icon, badge: icon, tag: 'tandem' });
-  return Promise.all(items.slice(-4).map(i => self.registration.showNotification(i.title, { body: i.body, icon, badge: icon, tag: i.id, data: { tab: i.tab || '' } })));
+  if (!items.length) return self.registration.showNotification('Tandem', { body: 'Open Tandem to see what’s new.', icon, badge, tag: 'tandem' });
+  return Promise.all(items.slice(-4).map(i => self.registration.showNotification(i.title, { body: i.body, icon, badge, tag: i.id, data: { tab: i.tab || '' } })));
 }
 self.addEventListener('push', e => { e.waitUntil(showNew()); });
 self.addEventListener('notificationclick', e => {

@@ -430,7 +430,8 @@ async function api(action, data = {}){
 const isBadSession = e => e && e.code === 'BAD_SESSION';
 
 const pending = new Map();
-let inflight = false, flushT = 0, needRefresh = false, failed = false;
+let inflight = false, flushT = 0, needRefresh = false, failed = false, lastErr = '';
+const errText = e => !e ? '' : e.code === 'NETWORK' ? 'No connection to Google' : (e.code || 'Error') + (e.info && e.info.message ? ': ' + e.info.message : '');
 function queueOp(op){
   pending.set(op.col + '/' + op.id, op);
   clearTimeout(flushT); flushT = setTimeout(flush, 350);
@@ -446,7 +447,7 @@ async function flush(){
     ok = true; failed = false;
   } catch(e){
     if(isBadSession(e)){ inflight = false; return signOut(true); }
-    failed = true;
+    failed = true; lastErr = 'Saving: ' + errText(e);
     ops.forEach(o => { const k = o.col + '/' + o.id; if(!pending.has(k)) pending.set(k, o); });
     toast('Couldn’t save just now. Trying again in a few seconds.');
   } finally { inflight = false; }
@@ -472,7 +473,7 @@ async function refresh(){
   } catch(e){
     if(isBadSession(e)) return signOut(true);
     if(mode === 'loading') mode = 'offline';
-    failed = true;
+    failed = true; lastErr = 'Loading: ' + errText(e);
   }
   render();
 }
@@ -480,7 +481,7 @@ async function poll(){
   if(mode !== 'synced' && mode !== 'offline') return;
   if(document.hidden || inflight || pending.size) return;
   try { const r = await api('getVersion'); failed = false; if(r.version !== version) refresh(); else render(); }
-  catch(e){ if(isBadSession(e)) signOut(true); else { failed = true; render(); } }
+  catch(e){ if(isBadSession(e)) signOut(true); else { failed = true; lastErr = 'Checking for changes: ' + errText(e); render(); } }
 }
 function signOut(expired){
   pushOff(!expired);
@@ -1139,7 +1140,9 @@ function listSheet(id){
 function viewFamily(){
   Object.keys(THEMES).forEach(loadFont);
   const ms = members();
-  const status = failed ? '<p><b>Can’t reach Google right now.</b> Your changes are kept and will save when the connection is back.</p>'
+  const status = failed ? `<p><b>Can’t reach Google right now.</b> Your changes are kept and will save when the connection is back.</p>
+      ${lastErr ? `<p class="note" style="margin:0 0 10px">Details: ${esc(lastErr)}${pending.size ? ` (${pending.size} change${pending.size>1?'s':''} waiting)` : ''}</p>` : ''}
+      <button class="btn ghost" style="width:100%;margin-bottom:12px" data-act="retrySync">Try again now</button>`
     : '<p><b>Synced.</b> Everything saves to your Google Sheet. The other phone picks up changes within about 15 seconds.</p>';
   return `<div class="wrap">
     <div class="hero"><div><h1>Family</h1><p>Each of you gets a color that follows you everywhere.</p></div></div>
@@ -1659,6 +1662,7 @@ document.addEventListener('click', e => {
     case 'previewCountdown': { const title = $('#f-title').value.trim() || 'Beach trip', emo = $('#f-emoji').value.trim();
       party(fillMsg($('#f-msg').value.trim() || '{thing} is today!', { thing: title }), emo ? `${emo} ${title}` : title, sheet.effect); break; }
     case 'delCountdown': if(armed(b)){ del('rewards', sheet.id); closeSheet(); } break;
+    case 'retrySync': if(pending.size){ clearTimeout(flushT); flush(); } else refresh(); toast('Trying again…'); break;
     case 'pushOn': enablePush(b); break;
     case 'pushOff': if(armed(b)){ pushOff(true).then(() => { pushState = 'off'; render(); toast('Notifications are off for this phone.'); }); } break;
     case 'pushTest': api('testPush').then(() => toast('Sent. It should arrive in a few seconds.')).catch(pushErr); break;
