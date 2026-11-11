@@ -352,6 +352,85 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .nbtns{display:flex;gap:10px;margin-top:10px}
 .nbtns .btn{min-height:46px;font-size:15px}
 
+/* ---------- Polish pass ---------- */
+[hidden]{display:none!important}
+h1,h2,h3,.section-title{text-wrap:balance}
+.th-num,.day-label b,.ev-t,.cd-num,.stars,.cell span:first-child{font-variant-numeric:tabular-nums}
+button,.chip,.cell,.slot,.ev,.cd,.dinner,.glance-m{transition:transform .12s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease,opacity .18s ease}
+.btn:active,.fab:active,.pill:active,.iconbtn:active,.chip:active,.ev:active,.slot:active,.cd:active,.dinner:active,.glance-m:active,.reward:active,.look:active,.datebtn:active,.sheet-x:active,.free:active{transform:scale(.97)}
+.tick:active{transform:scale(.9)}
+.btn:disabled{opacity:.55;pointer-events:none}
+.tab{transition:color .18s ease}
+.tab:active svg{transform:scale(.92)}
+.tab svg{transition:background .2s,transform .12s ease}
+
+/* quieter empty days, so planned days stand out */
+.free{min-height:50px;border-width:1.5px;border-radius:16px;font-size:14px;color:var(--muted);background:transparent}
+.day-body{min-height:50px}
+.day:not(.today) .day-label b{opacity:.9}
+.ev{position:relative;padding-left:22px}
+.ev::before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:4px;border-radius:4px;background:var(--c)}
+.ev.duo::before{background:linear-gradient(var(--c) 50%,var(--c2) 50%)}
+.ev.over{opacity:.55}
+.ev-n small{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-top:1px}
+.addday{border-radius:12px}
+
+/* month grid */
+.cell.today:not(.sel) span:first-child{display:grid;place-items:center;min-width:28px;height:28px;margin:-3px 0 -4px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.cell:active{background:var(--sunk)}
+.cell.sel:active{background:var(--accent)}
+
+/* form controls */
+.field input[type=text],.field input[type=password],.field input[type=date],.field input[type=time],.field select,.field textarea,.addbar input,.datebtn{transition:border-color .15s ease,box-shadow .15s ease}
+.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible,.addbar input:focus-visible,.nopt input[type=time]:focus-visible,.nopt select:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px color-mix(in srgb,var(--accent) 22%,transparent)}
+.field input::placeholder,.field textarea::placeholder,.addbar input::placeholder{color:var(--muted);opacity:.7}
+.field select,.nopt select{-webkit-appearance:none;appearance:none;padding-right:40px;background-repeat:no-repeat;background-position:right 14px center;background-size:16px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8399' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")}
+.nopt select{padding-right:32px;background-position:right 9px center;background-size:14px}
+.toggle input[type=checkbox],.nopt input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;position:relative;width:52px;height:32px;margin:0;border-radius:999px;cursor:pointer;
+  background:var(--line);background:color-mix(in srgb,var(--muted) 38%,var(--line));transition:background-color .2s ease}
+.toggle input[type=checkbox]::before,.nopt input[type=checkbox]::before{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .2s cubic-bezier(.3,1.3,.5,1),background-color .2s ease}
+.toggle input[type=checkbox]:checked,.nopt input[type=checkbox]:checked{background:var(--accent)}
+.toggle input[type=checkbox]:checked::before,.nopt input[type=checkbox]:checked::before{transform:translateX(20px);background:var(--accent-ink)}
+.toggle input[type=checkbox]:focus-visible,.nopt input[type=checkbox]:focus-visible{border-radius:999px}
+.toggle{cursor:pointer}
+
+/* sheet: soft scrim, and the save buttons stay in reach while you scroll */
+.scrim{animation:pfade .22s ease both;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.sheet{box-shadow:0 -10px 40px -12px rgba(20,14,32,.35)}
+.sheet>.actions:last-child{position:sticky;bottom:0;z-index:2;margin:8px -20px calc(-20px - env(safe-area-inset-bottom,0px));padding:22px 20px calc(14px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,var(--surface) calc(100% - 22px),transparent)}
+
+/* date picker (event window) */
+.datebtn{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);padding:8px 14px;text-align:left}
+.datebtn.open{border-color:var(--accent)}
+.datebtn svg{flex:none;width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
+.datebtn .chev{stroke-width:2.6;transition:transform .2s ease}
+.datebtn.open .chev{transform:rotate(180deg)}
+.datebtn .grow{flex:1;min-width:0}
+.datebtn b{display:block;font-weight:700;font-size:16px}
+.datebtn small{display:block;font-size:13px;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dp{margin-top:8px;background:var(--bg);border-radius:20px;padding:10px 10px 2px;animation:dpin .2s ease both}
+@keyframes dpin{from{opacity:0;transform:translateY(-6px)}}
+.dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dp-head b{font-family:var(--font-head);font-weight:var(--hw);font-size:18px}
+.dp-head .iconbtn{width:40px;height:40px}
+.dp-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));row-gap:2px}
+.dp-dow{text-align:center;font-size:12px;font-weight:800;color:var(--muted);padding:2px 0 4px}
+.dp-day{position:relative;height:44px;display:grid;place-items:center;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
+.dp-day span{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;transition:background-color .15s ease,color .15s ease,transform .12s ease}
+.dp-day:active span{transform:scale(.9)}
+.dp-day.out{color:var(--muted)}
+.dp-day.out:not(.on) span{opacity:.5}
+.dp-day.today:not(.on) span{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent)}
+.dp-day.on span{background:var(--accent);color:var(--accent-ink)}
+.dp-day.jl::before,.dp-day.jr::before{content:"";position:absolute;top:3px;bottom:3px;left:0;right:0;background:var(--sunk);background:color-mix(in srgb,var(--accent) 24%,transparent)}
+.dp-day.jl:not(.jr)::before{right:50%}
+.dp-day.jr:not(.jl)::before{left:50%}
+.dp-foot{margin-top:6px;padding:6px 6px 0;border-top:1.5px solid var(--line)}
+.dp-foot .toggle{margin-bottom:0;min-height:48px}
+.dp-foot .note{margin:-2px 0 10px;font-size:13px}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .plus1{display:none}
@@ -702,7 +781,9 @@ function viewWelcome(){
 }
 
 /* ---------- Calendar ---------- */
+const evDates = ev => (Array.isArray(ev.dates) && ev.dates.length > 1) ? ev.dates : null;
 function occurs(ev, d){
+  const many = evDates(ev); if(many) return many.includes(d); // hand-picked days
   if(d < ev.date) return false;
   if(ev.until && d > ev.until) return false;
   const a = parse(ev.date), b = parse(d);
@@ -727,8 +808,11 @@ function evItem(ev, d){
   const t = ev.allDay ? 'All day' : fmtTime(ev.start);
   const end = !ev.allDay && ev.end ? fmtTime(ev.end) : '';
   const rep = ev.repeat && ev.repeat !== 'none' ? ' ↻' : '';
-  return `<button class="ev ${c2?'duo':''}" style="--c:${esc(c)}${c2?';--c2:'+esc(c2):''}" data-act="editEvent" data-id="${esc(ev.id)}" data-date="${d}">
-    <span class="ev-t">${t}${end?`<small>${end}</small>`:''}</span><span class="ev-n">${esc(ev.title)}${rep}</span><span class="ev-who">${ms.map(m=>avatar(m,'sm')).join('')}</span></button>`;
+  const many = evDates(ev), sub = many ? `<small>Day ${many.indexOf(d) + 1} of ${many.length}</small>` : '';
+  const nowT = new Date(), hm = pad(nowT.getHours()) + ':' + pad(nowT.getMinutes()), last = ev.end && ev.end > ev.start ? ev.end : ev.start;
+  const over = d === today() && !ev.allDay && last && last < hm && !(ev.end && ev.end < ev.start);
+  return `<button class="ev ${c2?'duo':''} ${over?'over':''}" style="--c:${esc(c)}${c2?';--c2:'+esc(c2):''}" data-act="editEvent" data-id="${esc(ev.id)}" data-date="${d}">
+    <span class="ev-t">${t}${end?`<small>${end}</small>`:''}</span><span class="ev-n">${esc(ev.title)}${rep}${sub}</span><span class="ev-who">${ms.map(m=>avatar(m,'sm')).join('')}</span></button>`;
 }
 function dayEvents(d){
   const evs = eventsOn(d);
@@ -803,34 +887,90 @@ function viewCal(){
   </div>
   <button class="fab" data-act="newEvent" data-date="${st.calMode==='month'?st.selected:fromToday(st.cursor)}">${icon.plus}Event</button>`;
 }
+/* Date picker in the event window: one day, or several hand-picked days */
+function runsText(dates){ // "Nov 12–14, 17, Dec 2"
+  const out = []; let lastMon = -1;
+  for(let i = 0; i < dates.length; i++){
+    let j = i; while(j + 1 < dates.length && dates[j+1] === addDays(dates[j], 1)) j++;
+    const a = parse(dates[i]), b = parse(dates[j]);
+    let t = (a.getMonth() !== lastMon ? MON[a.getMonth()] + ' ' : '') + a.getDate();
+    if(j > i) t += '–' + (b.getMonth() !== a.getMonth() ? MON[b.getMonth()] + ' ' : '') + b.getDate();
+    out.push(t); lastMon = b.getMonth(); i = j;
+  }
+  return out.join(', ');
+}
+function whenField(){
+  const ds = sheet.dates, n = ds.length, y = parse(ds[0]).getFullYear();
+  const main = n > 1 ? `${n} days` : niceDate(ds[0]) + (y !== new Date().getFullYear() ? ', ' + y : '');
+  let cal = '';
+  if(sheet.calOpen){
+    const cur = parse(sheet.calMonth), start = weekStart(sheet.calMonth), t = today();
+    const lastOfMonth = ymd(new Date(cur.getFullYear(), cur.getMonth() + 1, 0));
+    const weeks = Math.ceil((Math.round((parse(lastOfMonth) - parse(start)) / 864e5) + 1) / 7);
+    let cells = DOW1.map(x => `<span class="dp-dow" aria-hidden="true">${x}</span>`).join('');
+    for(let i = 0; i < weeks * 7; i++){
+      const d = addDays(start, i), dd = parse(d), on = ds.includes(d);
+      // join neighbours into one bar when days in a row are picked
+      const l = on && dd.getDay() > 0 && ds.includes(addDays(d, -1)), r = on && dd.getDay() < 6 && ds.includes(addDays(d, 1));
+      cells += `<button type="button" class="dp-day ${dd.getMonth()!==cur.getMonth()?'out':''} ${d===t?'today':''} ${on?'on':''} ${l?'jl':''} ${r?'jr':''}" data-act="evDay" data-date="${d}" aria-pressed="${on}" aria-label="${niceDate(d)}"><span>${dd.getDate()}</span></button>`;
+    }
+    cal = `<div class="dp">
+      <div class="dp-head"><button type="button" class="iconbtn" data-act="evMonth" data-n="-1" aria-label="Previous month">${icon.left}</button><b>${MONTHS[cur.getMonth()]} ${cur.getFullYear()}</b><button type="button" class="iconbtn" data-act="evMonth" data-n="1" aria-label="Next month">${icon.right}</button></div>
+      <div class="dp-grid">${cells}</div>
+      <div class="dp-foot"><label class="toggle">Pick several days<input type="checkbox" data-act="evMulti" ${sheet.multi?'checked':''}></label>
+        <p class="note">${sheet.multi ? (n > 1 ? `Tap a day to add or remove it. ${n} picked.` : 'Tap every day this event happens.') : 'For shifts, trips, or anything on more than one day.'}</p></div>
+    </div>`;
+  }
+  return `<span id="f-when-label">${sheet.multi ? 'Days' : 'Date'}</span>
+    <button type="button" class="datebtn ${sheet.calOpen?'open':''}" data-act="evCal" aria-expanded="${sheet.calOpen}" aria-describedby="f-when-label">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+      <span class="grow"><b>${main}</b>${n > 1 ? `<small>${esc(runsText(ds))}</small>` : ''}</span>
+      <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${cal}`;
+}
+function drawWhen(){
+  const el = $('#f-when'); if(!el) return;
+  el.innerHTML = whenField();
+  const many = sheet.dates.length > 1;
+  $('#f-repeat-wrap').hidden = many; $('#f-repeat-off').hidden = !many;
+  const one = $('#f-onlyday'); if(one) one.hidden = !many || !sheet.dates.includes(sheet.tapped);
+}
 function eventSheet(id, date){
   const ev = id ? { id, ...S.events.get(id) } : { title:'', date: date||today(), allDay:false, start:'09:00', end:'10:00', memberIds:[], repeat:'none', notes:'' };
-  sheet = { kind:'event', id, memberIds:[...(ev.memberIds||[])] };
+  const dates = (evDates(ev) || [ev.date]).slice().sort();
+  const focus = id && date && dates.includes(date) ? date : dates[0];
+  sheet = { kind:'event', id, memberIds:[...(ev.memberIds||[])], dates, multi: dates.length > 1, calOpen: false,
+    calMonth: focus.slice(0, 8) + '01', tapped: id && dates.length > 1 ? focus : null };
   const ms = members();
   const reps = [['none','Doesn’t repeat'],['daily','Every day'],['weekly','Every week'],['biweekly','Every 2 weeks'],['monthly','Every month'],['yearly','Every year']];
   openSheet(`<h2>${id?'Edit event':'New event'}</h2>
     <label class="field"><span>Title</span><input type="text" id="f-title" value="${esc(ev.title)}" placeholder="Soccer practice" maxlength="120"></label>
+    <div class="field" id="f-when"></div>
     <label class="toggle">All day<input type="checkbox" id="f-allday" ${ev.allDay?'checked':''}></label>
-    <label class="field"><span>Date</span><input type="date" id="f-date" value="${esc(ev.date)}"></label>
     <div class="two" id="f-times" ${ev.allDay?'hidden':''}>
       <label class="field"><span>Starts</span><input type="time" id="f-start" value="${esc(ev.start||'09:00')}"></label>
       <label class="field"><span>Ends</span><input type="time" id="f-end" value="${esc(ev.end||'')}"></label>
     </div>
-    <div class="field"><span>Who’s going</span><div class="chips">${ms.map(m => `<button class="chip ${sheet.memberIds.includes(m.id)?'on':''}" style="--c:${esc(m.color)}" data-act="pickMem" data-id="${esc(m.id)}">${avatar(m)}${esc(m.name)}</button>`).join('')}</div></div>
-    <label class="field"><span>Repeats</span><select id="f-repeat">${reps.map(([v,l]) => `<option value="${v}" ${ev.repeat===v?'selected':''}>${l}</option>`).join('')}</select></label>
+    <div class="field"><span>Who’s going</span><div class="chips">${ms.map(m => `<button class="chip ${sheet.memberIds.includes(m.id)?'on':''}" style="--c:${esc(m.color)}" data-act="pickMem" data-id="${esc(m.id)}" aria-pressed="${sheet.memberIds.includes(m.id)}">${avatar(m)}${esc(m.name)}</button>`).join('')}</div></div>
+    <label class="field" id="f-repeat-wrap"><span>Repeats</span><select id="f-repeat">${reps.map(([v,l]) => `<option value="${v}" ${ev.repeat===v?'selected':''}>${l}</option>`).join('')}</select></label>
+    <p class="note" id="f-repeat-off" hidden>Repeating is off while several days are picked.</p>
     <label class="field"><span>Notes</span><textarea id="f-notes" maxlength="1000" placeholder="Bring shin guards">${esc(ev.notes||'')}</textarea></label>
-    ${id && ev.repeat && ev.repeat!=='none' ? '<p class="note">Changes apply to every repeat of this event.</p>' : ''}
+    ${id && ev.repeat && ev.repeat!=='none' && dates.length < 2 ? '<p class="note">Changes apply to every repeat of this event.</p>' : ''}
+    ${sheet.tapped ? `<button class="btn ghost" id="f-onlyday" style="width:100%;margin-bottom:6px" data-act="evDropDay">Remove ${niceDate(sheet.tapped)} only</button>` : ''}
     <div class="actions">${id?'<button class="btn danger" data-act="delEvent">Delete</button>':''}<button class="btn ghost" data-act="closeSheet">Cancel</button><button class="btn" data-act="saveEvent">Save event</button></div>`);
+  drawWhen();
   $('#f-allday').addEventListener('change', e => { $('#f-times').hidden = e.target.checked; });
 }
 function saveEvent(){
   const title = $('#f-title').value.trim();
   if(!title){ toast('Give the event a title.'); $('#f-title').focus(); return; }
-  const date = $('#f-date').value || today();
+  const dates = [...new Set(sheet.dates)].sort(), many = dates.length > 1;
   const allDay = $('#f-allday').checked;
-  const data = { title, date, allDay, start: allDay?'':$('#f-start').value, end: allDay?'':$('#f-end').value,
-    memberIds: sheet.memberIds, repeat: $('#f-repeat').value, notes: $('#f-notes').value.trim() };
+  const data = { title, date: dates[0] || today(), allDay, start: allDay?'':$('#f-start').value, end: allDay?'':$('#f-end').value,
+    memberIds: sheet.memberIds, repeat: many ? 'none' : $('#f-repeat').value, notes: $('#f-notes').value.trim() };
+  if(many) data.dates = dates;
+  const isNew = !sheet.id;
   put('events', sheet.id || uid(), data); closeSheet();
+  if(many && isNew) toast(`Added to ${dates.length} days.`);
 }
 
 /* ---------- Chores & rewards ---------- */
@@ -1576,10 +1716,25 @@ document.addEventListener('click', e => {
     case 'pickDay': st.selected = b.dataset.date; render(); break;
     case 'filter': st.filter.has(id) ? st.filter.delete(id) : st.filter.add(id); render(); break;
     case 'newEvent': if(!S.members.size) return memberSheet(); eventSheet(null, b.dataset.date); break;
-    case 'editEvent': eventSheet(id); break;
+    case 'editEvent': eventSheet(id, b.dataset.date); break;
     case 'saveEvent': saveEvent(); break;
     case 'delEvent': if(armed(b)){ del('events', sheet.id); closeSheet(); } break;
-    case 'pickMem': { const i = sheet.memberIds.indexOf(id); i<0 ? sheet.memberIds.push(id) : sheet.memberIds.splice(i,1); b.classList.toggle('on', i<0); break; }
+    case 'pickMem': { const i = sheet.memberIds.indexOf(id); i<0 ? sheet.memberIds.push(id) : sheet.memberIds.splice(i,1); b.classList.toggle('on', i<0); b.setAttribute('aria-pressed', i<0); break; }
+    case 'evCal': sheet.calOpen = !sheet.calOpen; if(sheet.calOpen && !sheet.multi) sheet.calMonth = sheet.dates[0].slice(0, 8) + '01'; drawWhen();
+      if(sheet.calOpen) $('#f-when .dp').scrollIntoView({ block:'nearest', behavior: reducedMQ.matches ? 'auto' : 'smooth' }); break;
+    case 'evMonth': { const d = parse(sheet.calMonth); sheet.calMonth = ymd(new Date(d.getFullYear(), d.getMonth() + Number(b.dataset.n), 1)); drawWhen(); break; }
+    case 'evMulti': sheet.multi = b.checked; if(!sheet.multi && sheet.dates.length > 1){ sheet.dates = [sheet.dates[0]]; toast(`Kept ${niceDate(sheet.dates[0])}.`); } drawWhen(); $('#f-when [data-act="evMulti"]').focus({ preventScroll:true }); break;
+    case 'evDay': { const d = b.dataset.date;
+      if(!sheet.multi){ sheet.dates = [d]; sheet.calOpen = false; }
+      else { const i = sheet.dates.indexOf(d);
+        if(i < 0){ sheet.dates.push(d); sheet.dates.sort(); }
+        else if(sheet.dates.length > 1) sheet.dates.splice(i, 1);
+        else { toast('Keep at least one day.'); break; }
+        if(d.slice(0, 7) !== sheet.calMonth.slice(0, 7)) sheet.calMonth = d.slice(0, 8) + '01'; }
+      drawWhen(); const again = $(`#f-when [data-date="${d}"]`) || $('#f-when .datebtn'); again && again.focus({ preventScroll:true }); break; }
+    case 'evDropDay': if(armed(b)){ const ev = S.events.get(sheet.id), left = (evDates(ev) || []).filter(x => x !== sheet.tapped);
+      if(left.length){ const copy = { ...ev, date: left[0] }; if(left.length > 1) copy.dates = left; else delete copy.dates; put('events', sheet.id, copy); toast(`Removed ${niceDate(sheet.tapped)}.`); }
+      closeSheet(); } break;
     // chores
     case 'choreDay': st.choreDate = addDays(st.choreDate, Number(b.dataset.n)); render(); break;
     case 'choreToday': st.choreDate = today(); render(); break;
