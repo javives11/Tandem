@@ -73,9 +73,9 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 
 /* Tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);padding:0 4px}
-.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 9px;font-size:12px;color:var(--muted);font-weight:700;min-height:58px}
-.tab svg{width:56px;height:30px;padding:3px 16px;border-radius:999px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:background .2s}
+.tabs .wrap{display:grid;grid-template-columns:repeat(6,1fr);padding:0 2px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 9px;font-size:11.5px;min-width:0;white-space:nowrap;color:var(--muted);font-weight:700;min-height:58px}
+.tab svg{width:50px;height:30px;padding:3px 13px;border-radius:999px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:background .2s}
 .tab[aria-current="page"]{color:var(--ink)}
 .tab[aria-current="page"] svg{background:var(--sunk);background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);stroke-width:2.2}
 
@@ -431,6 +431,149 @@ button,.chip,.cell,.slot,.ev,.cd,.dinner,.glance-m{transition:transform .12s eas
 .dp-foot .toggle{margin-bottom:0;min-height:48px}
 .dp-foot .note{margin:-2px 0 10px;font-size:13px}
 
+/* ---------- Habits tab: 30-day challenge ---------- */
+.chjump{display:inline-flex;align-items:center;gap:8px;height:40px;font-size:14px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.chjump svg{flex:none;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#challenge{scroll-margin-top:70px;margin-top:34px}
+#challenge>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chempty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:24px 18px}
+.chempty-emo{font-size:42px;line-height:1}
+.chempty b{font-size:18px;font-weight:800}
+.chempty p{margin:0 0 8px;color:var(--muted);font-weight:600;font-size:15px;max-width:40ch}
+.chempty .btn{flex:none}
+.chhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;margin-bottom:10px}
+.chmeta{flex:1;min-width:140px}
+.chmeta b{display:block;font-family:var(--font-head);font-size:26px;line-height:1.1;font-weight:var(--hw)}
+.chmeta small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-top:2px}
+.chprog{display:flex;gap:12px}
+.chp{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.chbtns{flex:1 1 100%;display:flex;gap:8px}
+.chbtns .btn,.recbtns .btn,.chadd,.slide-none .btn{display:flex;align-items:center;justify-content:center;gap:8px}
+.chbtns .btn svg,.recbtns .btn svg,.slide-none .btn svg{width:20px;height:20px;flex:none}
+.recbtns{display:flex;gap:8px;margin-bottom:18px}
+.recbtns .btn{min-height:58px}
+svg.ln{fill:none!important;stroke:currentColor!important;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chtitle{margin-top:34px}
+.chname{display:flex;align-items:center;gap:8px;min-width:0}
+.chname>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chname .av.sm{margin-left:0;width:28px;height:28px;font-size:13px;border:0}
+.chtools{margin:2px 0 8px}
+.chtools .seg button{min-height:34px;font-size:13px;padding:0 14px}
+.chgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;border-radius:20px;overflow:hidden}
+@media (min-width:560px){.chgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.chgrid .chday{border-radius:4px}
+.chgrid .chday.none{border-radius:10px}
+.chgrid .chd-n{font-size:16px;left:8px;top:6px}
+.chgrid .chd-m{top:27px;left:8px;font-size:11px}
+.chgrid .chd-did{left:8px;bottom:8px}.chgrid .chd-did i{width:11px;height:11px}
+.chgrid .chd-soc{right:8px;bottom:6px;font-size:12px}
+.chgrid .chd-c{display:inline!important}
+.chgrid .chd-plus{font-size:30px}
+.chd-up{position:absolute;inset:0;z-index:2;display:grid;place-items:center;background:rgba(0,0,0,.35)}
+.chd-up b{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;font-size:11px;font-weight:800;color:#fff;
+  background:radial-gradient(closest-side,rgba(0,0,0,.55) 74%,transparent 76%),conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.25) 0)}
+.chday.none .chd-up{background:color-mix(in srgb,var(--accent) 40%,transparent)}
+.chadd{width:100%;min-height:52px;margin-top:14px;border-radius:18px;border:2px dashed var(--line);color:var(--accent);font-weight:800}
+.chadd svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+.chmore{margin:0 0 14px}
+.chmore summary{cursor:pointer;font-weight:800;color:var(--accent);font-size:15px;min-height:40px;display:flex;align-items:center;list-style:none}
+.chmore summary::-webkit-details-marker{display:none}
+.chmore summary::before{content:"+";display:inline-grid;place-items:center;width:22px;height:22px;margin-right:8px;border-radius:50%;background:var(--sunk);font-size:16px}
+.chmore[open] summary::before{content:"–"}
+.chmore[open] summary{margin-bottom:8px}
+.reel-top .av{width:32px;height:32px;font-size:14px}
+.chhead .btn svg,.chd-play svg,.poster-play svg{fill:currentColor;stroke:none}
+.chhead .btn svg{width:20px;height:20px}
+.chcal{background:var(--surface);border-radius:24px;padding:8px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+@media (max-width:420px){.chcal{margin:0 -10px;padding:6px;gap:3px}}
+.chcal .dow{text-align:center;font-size:12px;color:var(--muted);font-weight:800;padding:2px 0 3px}
+.chday{position:relative;aspect-ratio:9/16;min-width:0;border-radius:12px;overflow:hidden;color:#fff;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 80%,#000),color-mix(in srgb,var(--accent) 45%,var(--star)))}
+.chday .chthumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.chday::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(0,0,0,.5),transparent 42%,transparent 58%,rgba(0,0,0,.55))}
+.chday.today{box-shadow:0 0 0 2.5px var(--surface),0 0 0 5px var(--accent);z-index:1}
+.chday.none{background:transparent;border:1.5px dashed var(--line);color:var(--muted)}
+.chday.none::after{display:none}
+.chd-plus{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:600;opacity:.55}
+.chd-play{position:absolute;inset:0;display:grid;place-items:center;opacity:.9}
+.chd-play svg{width:22px;height:22px}
+.chd-n{position:absolute;left:5px;top:2px;z-index:1;font-family:var(--font-head);font-weight:var(--hw);font-size:15px;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,.45);font-variant-numeric:tabular-nums}
+.chday.none .chd-n{text-shadow:none}
+.chd-m{position:absolute;left:5px;top:20px;z-index:1;font-size:9.5px;font-weight:800;line-height:1;opacity:.92;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.chday.none .chd-m{text-shadow:none}
+.chd-did{position:absolute;left:4px;bottom:4px;z-index:1;display:flex;gap:2px}
+.chd-did i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1.5px #fff}
+.chd-soc b{font-weight:800}
+@media (max-width:559px){.chd-c{display:none}}
+.chd-soc{position:absolute;right:3px;bottom:2px;z-index:1;font-size:10px;font-weight:800;line-height:1.3;text-shadow:0 1px 2px rgba(0,0,0,.5);white-space:nowrap}
+.chday.none .chd-soc{text-shadow:none}
+@media (min-width:560px){.chd-n{font-size:19px;left:7px;top:4px}.chd-m{top:27px;left:7px;font-size:11px}.chd-did i{width:11px;height:11px}.chd-soc{font-size:12px;right:5px;bottom:4px}}
+.chnote{margin:10px 2px 0;padding-right:150px;min-height:56px}
+@media (min-width:760px){.chnote{padding-right:0}}
+.chday:active{transform:scale(.95)}
+
+/* comments */
+.cmt{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1.5px solid var(--line)}
+.cmt:first-child{border-top:0}
+.cmt .grow{flex:1;min-width:0}
+.cmt b{font-weight:800}
+.cmt small{color:var(--muted);font-weight:700;font-size:13px}
+.cmt p{margin:2px 0 0;word-break:break-word;font-weight:600}
+.cmt .x[data-armed]{width:auto;padding:0 10px;font-size:13px;font-weight:800;color:var(--danger)}
+.cmtbar{align-items:center}
+.cmtbar input{flex:1;min-width:0;height:52px;border-radius:999px;border:1.5px solid var(--line);background:var(--bg);padding:0 18px;font-size:16px}
+.cmtbar input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px color-mix(in srgb,var(--accent) 22%,transparent)}
+.cmtbar .btn{flex:none}
+
+/* full-screen player */
+html.reel-open,html.reel-open body{overflow:hidden}
+#reel{position:fixed;inset:0;z-index:15;background:#0B0910;color:#fff;animation:pfade .2s ease both}
+.reel-scroll{position:absolute;inset:0;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.reel-scroll::-webkit-scrollbar{display:none}
+.slide{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;overflow:hidden;
+  padding:calc(58px + env(safe-area-inset-top,0px)) 0 calc(14px + env(safe-area-inset-bottom,0px))}
+.slide-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.slide-bg img{width:100%;height:100%;object-fit:cover;filter:blur(30px) brightness(.4) saturate(1.2);transform:scale(1.25)}
+.slide-body{position:relative;flex:1;min-height:0;display:flex;gap:4px;padding:0 4px 0 10px;max-width:640px;width:100%;margin:0 auto}
+.slide-media{position:relative;flex:1;min-width:0;border-radius:20px;overflow:hidden;background:#000}
+.slide-media iframe,.slide-media video,.poster{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.slide-media video{object-fit:contain;background:#000}
+.poster{background:transparent}
+.poster-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.poster-play{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:rgba(0,0,0,.5);display:grid;place-items:center;color:#fff}
+.poster-play svg{width:34px;height:34px;margin-left:4px}
+.sound{position:absolute;left:12px;top:12px;z-index:2;background:rgba(0,0,0,.6);color:#fff;border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800}
+.slide-none{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;font-size:17px}
+.slide-none .btn{flex:none;display:inline-flex;align-items:center;text-decoration:none}
+.slide-rail{flex:none;width:60px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:12px;padding-bottom:6px}
+.rail-b{display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;font-size:12px;font-weight:800;min-width:56px;font-variant-numeric:tabular-nums}
+.rail-i{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;transition:background-color .18s ease,transform .12s ease}
+.rail-i svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rail-b:active .rail-i{transform:scale(.88)}
+.rail-b.liked .rail-i svg{fill:#FF4D6D;stroke:#FF4D6D}
+.rail-b.did .rail-i{background:var(--ok)}
+.rail-b.did .rail-i svg{stroke-width:2.8}
+.rail-b.pop .rail-i{animation:fill .55s var(--fxd,0ms) both}
+.slide-cap{position:relative;padding:12px 16px 0;max-width:640px;width:100%;margin:0 auto}
+.cap-day{font-family:var(--font-head);font-size:24px;line-height:1.15;font-weight:var(--hw)}
+.cap-day span{font-family:var(--font);font-size:14px;font-weight:700;opacity:.75}
+.cap-t{display:block;font-size:16px;font-weight:800;margin-top:2px;line-height:1.3}
+.cap-note{margin:2px 0 0;font-size:14px;opacity:.85;font-weight:600;line-height:1.35;max-height:3.9em;overflow:auto}
+.cap-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.cap-row:empty{display:none}
+.cap-tag{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:3px 11px;border-radius:999px;background:rgba(255,255,255,.14);font-size:13px;font-weight:800;color:#fff;text-decoration:none}
+.cap-tag svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cap-avs{display:inline-flex;margin-left:-6px}
+.cap-avs .av.sm{border-color:transparent;box-shadow:0 0 0 2px rgba(0,0,0,.4);width:22px;height:22px}
+.cap-cmt{display:block;width:100%;margin-top:8px;text-align:left;font-size:14px;font-weight:600;opacity:.9;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-height:30px}
+.cap-cmt b{font-weight:800}
+.reel-top{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;align-items:center;gap:10px;padding:calc(7px + env(safe-area-inset-top,0px)) 12px 7px;background:linear-gradient(rgba(11,9,16,.85),rgba(11,9,16,0));pointer-events:none}
+.reel-top>*{pointer-events:auto}
+.reel-x{flex:none;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;color:#fff}
+.reel-x svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+.reel-title{flex:1;min-width:0;font-family:var(--font-head);font-weight:var(--hw);font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reel-pos{flex:none;font-size:13px;font-weight:800;background:rgba(255,255,255,.16);padding:5px 11px;border-radius:999px;font-variant-numeric:tabular-nums}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .plus1{display:none}
@@ -447,7 +590,8 @@ button,.chip,.cell,.slot,.ev,.cd,.dinner,.glance-m{transition:transform .12s eas
 
 <nav class="tabs" aria-label="Sections"><div class="wrap">
   <button class="tab" data-tab="cal"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
-  <button class="tab" data-tab="chores"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/></svg>Daily</button>
+  <button class="tab" data-tab="chores"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/></svg>Chores</button>
+  <button class="tab" data-tab="habits"><svg viewBox="0 0 24 24"><path d="M12 3.2c.9 3.4 5.3 5.6 5.3 10.3a5.3 5.3 0 0 1-10.6 0c0-2.5 1.3-4 2.6-5.3.2 1.7 1 2.8 2.2 3.2-.1-3-.5-5.7.5-8.2z"/></svg>Habits</button>
   <button class="tab" data-tab="meals"><svg viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 0 1-16 0zM9 7c0-1.5 1-1.5 1-3M13 7c0-1.5 1-1.5 1-3"/></svg>Meals</button>
   <button class="tab" data-tab="lists"><svg viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.8" cy="6.5" r="1.1"/><circle cx="4.8" cy="12" r="1.1"/><circle cx="4.8" cy="17.5" r="1.1"/></svg>Lists</button>
   <button class="tab" data-tab="family"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.3"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16.5 14.6c2.3.2 4 1.6 4.5 4.4"/></svg>Family</button>
@@ -564,6 +708,7 @@ async function poll(){
 }
 function signOut(expired){
   pushOff(!expired);
+  if(reel) closeReel();
   if(TOKEN && !expired) api('logout').catch(() => {});
   TOKEN = ''; ME = ''; try { localStorage.removeItem(TKEY); } catch(e){}
   COLS.forEach(c => S[c] = new Map()); pending.clear(); version = -1;
@@ -671,7 +816,7 @@ function lookPicker(){
 /* ---------- UI state ---------- */
 const st = {
   tab: 'cal', calMode: 'week', cursor: today(), selected: today(), filter: new Set(),
-  choreDate: today(), choreMode: 'chores', mealWeek: today(), listId: null, showAllChores: false, itemWho: null
+  choreDate: today(), showAllHabits: false, chView: 'cal', mealWeek: today(), listId: null, showAllChores: false, itemWho: null
 };
 let sheet = null; // {kind, ...}
 
@@ -751,7 +896,7 @@ function render(){
   if(mode === 'locked') html = viewLock();
   else if(mode === 'loading') html = `<div class="wrap loading">Loading your board…</div>`;
   else if(!S.members.size && st.tab !== 'family') html = viewWelcome();
-  else html = ({ cal: viewCal, chores: viewChores, meals: viewMeals, lists: viewLists, family: viewFamily })[st.tab]();
+  else html = ({ cal: viewCal, chores: viewChores, habits: viewHabits, meals: viewMeals, lists: viewLists, family: viewFamily })[st.tab]();
   view.innerHTML = html;
 
   if(keep){ const el = document.getElementById(keep.id); if(el){ el.value = keep.v; el.focus({preventScroll:true}); try{ el.setSelectionRange(keep.s, keep.e); }catch(e){} } }
@@ -981,7 +1126,6 @@ function balance(mid){
   return n;
 }
 function viewChores(){
-  if(st.choreMode === 'habits') return viewHabits();
   const d = st.choreDate, dow = parse(d).getDay(), t = today();
   const chores = all('chores');
   const label = d === t ? 'Today' : d === addDays(t,-1) ? 'Yesterday' : d === addDays(t,1) ? 'Tomorrow' : DOW[dow];
@@ -1011,7 +1155,6 @@ function viewChores(){
 
   return `<div class="wrap">
     ${dayNav(d)}
-    ${modeSeg()}
     ${allDone}
     <div class="kids">${cards}</div>
     <div class="section-title">Rewards<button class="link" data-act="newReward">+ Add reward</button></div>
@@ -1020,9 +1163,6 @@ function viewChores(){
     ${manage}
   </div>
   <button class="fab" data-act="newChore">${icon.plus}Chore</button>`;
-}
-function modeSeg(){
-  return `<div class="toolbar"><div class="seg"><button data-act="choreMode" data-mode="chores" aria-pressed="${st.choreMode==='chores'}">Chores</button><button data-act="choreMode" data-mode="habits" aria-pressed="${st.choreMode==='habits'}">Habits</button></div></div>`;
 }
 function dayNav(d){
   const t = today(), dow = parse(d).getDay();
@@ -1068,15 +1208,16 @@ function viewHabits(){
       ${rest && rows ? `<p class="empty" style="margin:8px 0 0">${rest} more on other days</p>` : ''}
     </div>`;
   }).join('');
-  const manage = st.showAllChores ? `<div class="card">${habits.length ? habits.map(h => { const m = mem(h.memberId);
+  const manage = st.showAllHabits ? `<div class="card">${habits.length ? habits.map(h => { const m = mem(h.memberId);
       return `<button class="row" data-act="editHabit" data-id="${esc(h.id)}">${avatar(m)}<span class="grow">${h.emoji?esc(h.emoji)+' ':''}${esc(h.title)}<small>${daysText(h.days)} · ${streak(h, today())} day streak</small></span><span class="link">Edit</span></button>`; }).join('')
       : '<p class="empty">No habits yet.</p>'}</div>` : '';
   return `<div class="wrap">
     ${dayNav(d)}
-    ${modeSeg()}
+    <div class="toolbar"><button class="pill chjump" data-act="chJump">🎬 ${challenges().length > 1 ? '30-Day Challenges' : esc(challenges()[0]?.title || '30-Day Challenge')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button></div>
     <div class="kids">${cards}</div>
-    <div class="section-title">All habits<button class="link" data-act="toggleAllChores">${st.showAllChores?'Hide':'Show'}</button></div>
+    <div class="section-title">All habits<button class="link" data-act="toggleAllHabits">${st.showAllHabits?'Hide':'Show'}</button></div>
     ${manage}
+    ${viewChallenges()}
   </div>
   <button class="fab" data-act="newHabit">${icon.plus}Habit</button>`;
 }
@@ -1113,6 +1254,496 @@ function toggleHabit(id){
     const h = S.habits.get(id), m = h && mem(h.memberId);
     if(h){ const sk = streak(h, st.choreDate);
       celebrate('habit', { name: m?.name, thing: h.title, color: m?.color, sub: `${h.emoji ? h.emoji + ' ' : ''}${h.title}${sk > 1 ? `, ${sk} day streak` : ''}` }); }
+  }
+}
+
+/* ---------- 30-day challenges (bottom of the Habits tab) ----------
+   Each person can start their own challenge with its own calendar.
+   Stored as special rows in the rewards tab of your Sheet, like the settings:
+   __chg_<c>                  a challenge { title, emoji, start, len, owner }
+   __chv_<c>_<day>            that day's video { url, title, note, thumb, drive, by, at }
+   __chl_<c>_<day>_<member>   a like
+   __chx_<c>_<day>_<member>   "did it"
+   __chc_<c>_<id>             a comment { day, memberId, text, at }
+   Recorded videos go to a "Tandem videos" folder in your Google Drive (see Video.gs). */
+const CH_LEN = 30;
+const chRows = pre => [...S.rewards].filter(([id]) => String(id).startsWith(pre)).map(([id, v]) => ({ id, ...v }));
+const chGet = c => { const v = S.rewards.get('__chg_' + c); return v ? { cid: c, ...v } : null; };
+function challenges(){
+  const order = new Map(members().map((m, i) => [m.id, i]));
+  return chRows('__chg_').map(r => ({ cid: r.id.slice(6), ...r }))
+    .sort((a, b) => (order.get(a.owner) ?? 99) - (order.get(b.owner) ?? 99) || (a.created || 0) - (b.created || 0));
+}
+const chLen = c => Number(chGet(c)?.len) || CH_LEN;
+const chVid = (c, n) => S.rewards.get(`__chv_${c}_${n}`) || null;
+const chLikes = (c, n) => members().filter(m => S.rewards.has(`__chl_${c}_${n}_${m.id}`));
+const chDid = (c, n) => members().filter(m => S.rewards.has(`__chx_${c}_${n}_${m.id}`));
+const chComments = (c, n) => chRows(`__chc_${c}_`).filter(x => Number(x.day) === n).sort((a, b) => (a.at || 0) - (b.at || 0));
+const chDate = (c, n) => addDays(chGet(c).start, n - 1);
+const chToday = c => { const x = chGet(c); return x ? Math.round((parse(today()) - parse(x.start)) / 864e5) + 1 : 0; };
+function ago(t){
+  const s = (Date.now() - (Number(t) || 0)) / 1000;
+  if(s < 60) return 'just now'; if(s < 3600) return Math.floor(s / 60) + 'm'; if(s < 86400) return Math.floor(s / 3600) + 'h';
+  const d = new Date(Number(t)); return s < 6 * 86400 ? DOW[d.getDay()] : `${MON[d.getMonth()]} ${d.getDate()}`;
+}
+
+/* Which person is using this phone. Matches the sign-in name, or asks once. */
+const ME_KEY = 'tandem-me';
+function meMember(){
+  const ms = members(), n = (ME || '').trim().toLowerCase();
+  let saved = ''; try { saved = localStorage.getItem(ME_KEY) || ''; } catch(e){}
+  return ms.find(m => (m.name || '').trim().toLowerCase() === n) || ms.find(m => m.id === saved) || null;
+}
+function needMe(then){
+  const m = meMember(); if(m) return m;
+  sheet = { kind:'who', then };
+  openSheet(`<h2>Which one is you?<small>So your challenges, likes and comments have your name. This phone only asks once.</small></h2>
+    <div class="chips" style="flex-wrap:wrap">${members().map(m => `<button class="chip" style="--c:${esc(m.color)}" data-act="chSetMe" data-id="${esc(m.id)}">${avatar(m)}${esc(m.name)}</button>`).join('')}</div>`);
+  return null;
+}
+const isMine = x => { const me = meMember(); return !me || (x && x.owner === me.id); }; // unknown phone: let them try, needMe sorts it out
+
+/* The first version kept one shared challenge under "__ch"; move it to the new layout once */
+let chMigrated = false;
+function chMigrate(){
+  if(chMigrated || mode !== 'synced' || !S.rewards.has('__ch') || !S.members.size) return;
+  chMigrated = true;
+  const c = uid(), old = S.rewards.get('__ch'), owner = (meMember() || members()[0]).id;
+  put('rewards', '__chg_' + c, { ...old, owner, created: Date.now() }); del('rewards', '__ch');
+  [...S.rewards].forEach(([k, v]) => {
+    let m;
+    if((m = /^__ch([vlx])_(\d+(?:_[^_]+)?)$/.exec(k))){ put('rewards', `__ch${m[1]}_${c}_${m[2]}`, v); del('rewards', k); }
+    else if((m = /^__chc_([a-z0-9]+)$/.exec(k)) && v && v.day){ put('rewards', `__chc_${c}_${m[1]}`, v); del('rewards', k); }
+  });
+}
+
+/* ---- video links: recorded (Google Drive), YouTube, TikTok, Instagram, Vimeo, or a video file ---- */
+function ytInfo(id, vertical){
+  return { kind:'yt', id, vertical, url:`https://www.youtube.com/watch?v=${id}`, thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    embed:`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${id}` };
+}
+function driveInfo(id, url){
+  return { kind:'drive', id, url: url || `https://drive.google.com/file/d/${id}/view`, thumb:`https://drive.google.com/thumbnail?id=${id}&sz=w480`,
+    stream:`https://drive.google.com/uc?export=download&id=${id}`, embed:`https://drive.google.com/file/d/${id}/preview` };
+}
+function vidInfo(raw){
+  raw = String(raw || '').trim(); if(!raw) return null;
+  let u; try { u = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw); } catch(e){ return { kind:'link', url: raw }; }
+  const h = u.hostname.toLowerCase().replace(/^(www|m|mobile|vm|vt)\./, ''), p = u.pathname; let m;
+  if(h === 'youtu.be' && (m = p.match(/^\/([\w-]{11})/))) return ytInfo(m[1]);
+  if(/(^|\.)youtube(-nocookie)?\.com$/.test(h)){
+    if(/^[\w-]{11}$/.test(u.searchParams.get('v') || '')) return ytInfo(u.searchParams.get('v'));
+    if((m = p.match(/^\/(shorts|embed|live|v)\/([\w-]{11})/))) return ytInfo(m[2], m[1] === 'shorts');
+  }
+  if(/(^|\.)tiktok\.com$/.test(u.hostname)){ m = p.match(/\/(?:video|v1)\/(\d+)/); return { kind:'tiktok', url:u.href, id: m ? m[1] : '', vertical:true }; }
+  if(/(^|\.)instagram\.com$/.test(h) && (m = p.match(/\/(reels?|p|tv)\/([\w-]+)/)))
+    return { kind:'ig', url:u.href, id:m[2], vertical:true, embed:`https://www.instagram.com/${m[1] === 'p' ? 'p' : 'reel'}/${m[2]}/embed/` };
+  if((h === 'vimeo.com' && (m = p.match(/^\/(\d+)/))) || (h === 'player.vimeo.com' && (m = p.match(/\/video\/(\d+)/))))
+    return { kind:'vimeo', url:`https://vimeo.com/${m[1]}`, id:m[1], embed:`https://player.vimeo.com/video/${m[1]}?autoplay=1&playsinline=1&loop=1` };
+  if(h === 'drive.google.com'){ const id = (p.match(/\/file\/d\/([\w-]+)/) || [])[1] || u.searchParams.get('id'); if(id) return driveInfo(id, u.href); }
+  if(/\.(mp4|webm|mov|m4v|ogv)$/i.test(p)) return { kind:'file', url:u.href };
+  return { kind:'link', url:u.href };
+}
+// Preview pictures and titles for TikTok, Vimeo and YouTube, kept on this phone for a while
+const VM_KEY = 'tandem-vmeta'; let VMETA = {};
+try { VMETA = JSON.parse(localStorage.getItem(VM_KEY) || '{}'); } catch(e){}
+const vmBusy = new Set();
+function vmeta(v){
+  const ep = { tiktok:'https://www.tiktok.com/oembed?url=', vimeo:'https://vimeo.com/api/oembed.json?url=', yt:'https://www.youtube.com/oembed?format=json&url=' }[v.kind];
+  if(!ep) return {};
+  const c = VMETA[v.url], ttl = v.kind === 'tiktok' ? 6 * 36e5 : 30 * 864e5; // TikTok's picture links expire
+  if(c && Date.now() - c.at < ttl) return c;
+  if(!vmBusy.has(v.url) && mode !== 'locked'){
+    vmBusy.add(v.url);
+    fetch(ep + encodeURIComponent(v.url)).then(r => r.ok ? r.json() : Promise.reject())
+      .then(j => { VMETA[v.url] = { at: Date.now(), thumb: j.thumbnail_url || '', title: j.title || '', id: String(j.embed_product_id || '') }; })
+      .catch(() => { VMETA[v.url] = { ...(c || {}), at: Date.now() - ttl + 15 * 6e4 }; }) // try again in 15 minutes
+      .finally(() => {
+        vmBusy.delete(v.url);
+        const cut = Date.now() - 60 * 864e5; Object.keys(VMETA).forEach(k => { if(VMETA[k].at < cut) delete VMETA[k]; });
+        try { localStorage.setItem(VM_KEY, JSON.stringify(VMETA)); } catch(e){}
+        scheduleRender();
+      });
+  }
+  return c || {};
+}
+const LOCAL = new Map(); // Drive id -> the video still on this phone, so it plays before Drive finishes processing
+function vid(c, n){
+  const r = chVid(c, n); if(!r || !(r.url || r.drive)) return null;
+  const v = r.drive ? driveInfo(r.drive) : vidInfo(r.url); if(!v) return null;
+  const mt = vmeta(v);
+  if(r.thumb) v.thumb = r.thumb; else if(!v.thumb && mt.thumb) v.thumb = mt.thumb;
+  if(v.kind === 'tiktok'){ v.id = v.id || mt.id; if(v.id) v.embed = `https://www.tiktok.com/player/v1/${v.id}?autoplay=1&loop=1&rel=0&description=0&music_info=0`; }
+  if(v.kind === 'drive' && LOCAL.has(v.id)) v.stream = LOCAL.get(v.id);
+  v.title = r.title || mt.title || ''; v.note = r.note || ''; v.rec = !!r.drive; v.by = r.by;
+  return v;
+}
+function thumbHtml(v, cls){
+  if(!v) return '';
+  if(v.thumb) return `<img class="${cls}" src="${esc(v.thumb)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`;
+  if(v.kind === 'file') return `<video class="${cls}" src="${esc(v.url)}#t=0.5" muted playsinline preload="metadata" tabindex="-1" aria-hidden="true"></video>`;
+  return '';
+}
+const svg = {
+  heart:'<svg viewBox="0 0 24 24"><path d="M12 20.3c-.3 0-.6-.1-.8-.3C6.9 16.4 3.5 13.5 3.5 9.6 3.5 7 5.5 5 8 5c1.6 0 3 .8 4 2.1C13 5.8 14.4 5 16 5c2.5 0 4.5 2 4.5 4.6 0 3.9-3.4 6.8-7.7 10.4-.2.2-.5.3-.8.3z"/></svg>',
+  chat:'<svg viewBox="0 0 24 24"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.4-.2-3.4-.7L4 19.5l1.3-3.7C4.5 14.6 4 13.1 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  edit:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  play:'<svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>',
+  open:'<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  cam:'<svg class="ln" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg>',
+  pick:'<svg class="ln" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 15.5l5-4.5 4 3.5 3-2.5 4.5 4"/><circle cx="15.5" cy="9" r="1.6"/></svg>'
+};
+
+/* ---- recording and uploading to your Google Drive ---- */
+const UPL = new Map(); // "<c>_<day>" -> percent uploaded
+function pickVideo(c, n, capture){
+  const meta = { title: $('#f-title')?.value.trim() || '', note: $('#f-note')?.value.trim() || '' };
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'video/*';
+  if(capture) inp.setAttribute('capture', 'user');
+  inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; if(f) uploadVideo(f, c, n, meta); });
+  inp.click();
+}
+function posterFrom(file){ // a small preview picture from the video itself, made on the phone
+  return new Promise(res => {
+    const v = document.createElement('video'), url = URL.createObjectURL(file); let done = false;
+    const finish = d => { if(done) return; done = true; clearTimeout(t); URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); res(d || ''); };
+    const t = setTimeout(() => finish(''), 6000);
+    v.muted = true; v.playsInline = true; v.preload = 'auto';
+    v.addEventListener('loadeddata', () => { try { v.currentTime = Math.min(0.6, (v.duration || 1) / 2); } catch(e){ finish(''); } });
+    v.addEventListener('seeked', () => {
+      try {
+        const H = 320, W = Math.round(H * (v.videoWidth / v.videoHeight || 9 / 16)), cv = document.createElement('canvas');
+        cv.width = W; cv.height = H; cv.getContext('2d').drawImage(v, 0, 0, W, H);
+        finish(cv.toDataURL('image/jpeg', .55));
+      } catch(e){ finish(''); }
+    });
+    v.addEventListener('error', () => finish(''));
+    v.src = url; v.load();
+  });
+}
+function putFile(url, file, onPct){
+  return new Promise((ok, fail) => {
+    const x = new XMLHttpRequest(); x.open('PUT', url);
+    x.upload.onprogress = e => { if(e.lengthComputable) onPct(Math.round(e.loaded / e.total * 100)); };
+    x.onload = () => { if(x.status >= 200 && x.status < 300){ try { ok(JSON.parse(x.responseText).id); } catch(e){ fail(new Error('BAD_RESPONSE')); } } else fail(new Error('UPLOAD_' + x.status)); };
+    x.onerror = () => fail(Object.assign(new Error('NETWORK'), { code:'NETWORK' }));
+    x.send(file);
+  });
+}
+async function uploadVideo(file, c, n, meta = {}){
+  const me = meMember(), ch = chGet(c), key = c + '_' + n; if(!me || !ch) return;
+  if(file.type && !file.type.startsWith('video/')){ toast('That isn’t a video.'); return; }
+  if(UPL.has(key)){ toast('Day ' + n + ' is already uploading.'); return; }
+  if(sheet) closeSheet();
+  UPL.set(key, 0); render(); toast(`Uploading Day ${n}. You can keep using the app.`);
+  try {
+    const thumb = await posterFrom(file);
+    const ext = (file.name.match(/\.\w+$/) || ['.mp4'])[0];
+    const s = await api('video', { step:'start', name: `${ch.title} - ${me.name} - Day ${n}${ext}`, type: file.type || 'video/mp4', size: file.size, origin: location.origin });
+    let last = 0;
+    const id = await putFile(s.url, file, p => { UPL.set(key, p); if(p - last >= 3 || p === 100){ last = p; scheduleRender(); } });
+    await api('video', { step:'done', id });
+    LOCAL.set(id, URL.createObjectURL(file));
+    const old = chVid(c, n);
+    put('rewards', `__chv_${c}_${n}`, { drive: id, thumb, title: meta.title || '', note: meta.note || '', by: me.id, at: Date.now() });
+    if(old && old.drive && old.drive !== id) api('video', { step:'trash', id: old.drive }).catch(() => {});
+    UPL.delete(key); toast(`Day ${n} is posted.`);
+    if(!S.rewards.has(`__chx_${c}_${n}_${me.id}`)) chDidIt(c, n);
+  } catch(e){
+    UPL.delete(key); render();
+    if(isBadSession(e)) return signOut(true);
+    toast(e.code === 'UNKNOWN_ACTION' ? 'Your Apps Script needs the Video.gs update before recording works.'
+      : e.code === 'NETWORK' ? 'Upload stopped. Check your connection and try again.'
+      : 'Couldn’t upload that video' + (e.info && e.info.message ? ': ' + e.info.message.slice(0, 80) : '. Try again.'));
+  }
+}
+
+/* ---- each challenge's section on the Habits tab ---- */
+function viewChallenges(){
+  const list = challenges(), me = meMember();
+  if(!list.length) return `<div class="section-title" id="challenge">30-Day Challenges</div>
+    <div class="card chempty"><span class="chempty-emo" aria-hidden="true">🎬</span><b>Do something for 30 days.</b>
+      <p>Start your own challenge, record a video each day, and watch them line up on your calendar. You can each have your own, and like and comment on each other’s days.</p>
+      <button class="btn" data-act="chNew">Start a 30-day challenge</button></div>`;
+  return list.map((x, i) => viewChallenge(x, i)).join('') +
+    `<button class="chadd" data-act="chNew">${icon.plus}New challenge${me ? ` for ${esc(me.name)}` : ''}</button>`;
+}
+function viewChallenge(x, i){
+  const c = x.cid, len = chLen(c), now = chToday(c), cur = Math.min(Math.max(now, 1), len), owner = mem(x.owner), mine = isMine(x);
+  const status = now < 1 ? `Starts ${niceDate(x.start)}` : now > len ? 'Challenge complete' : `Day ${now} of ${len}`;
+  const prog = members().map(m => { let n = 0; for(let d = 1; d <= len; d++) if(S.rewards.has(`__chx_${c}_${d}_${m.id}`)) n++;
+    return (m.id === x.owner || n) ? `<span class="chp">${ring(m, Math.round(n / len * 100), '')}<small>${n}/${len}</small><span class="sr">${esc(m.name)} has done ${n} of ${len} days</span></span>` : ''; }).join('');
+  const recordable = mine && now >= 1 && now <= len && !chVid(c, now) && !UPL.has(c + '_' + now);
+  const grid = st.chView === 'grid';
+  let cells = '';
+  if(!grid) cells = DOW1.map(d => `<span class="dow" aria-hidden="true">${d}</span>`).join('') + '<span></span>'.repeat(parse(x.start).getDay());
+  for(let n = 1; n <= len; n++) cells += chTile(x, n, grid, now, mine);
+  return `<div class="section-title chtitle" ${i === 0 ? 'id="challenge"' : ''} style="--c:${esc(owner?.color || 'var(--accent)')}">
+      <span class="chname">${owner ? avatar(owner, 'sm') : ''}<span>${x.emoji ? esc(x.emoji) + ' ' : ''}${esc(x.title)}</span></span>
+      ${mine ? `<button class="link" data-act="chSetup" data-c="${esc(c)}">Edit</button>` : ''}</div>
+    <div class="card chhead">
+      <div class="chmeta"><b>${status}</b><small>${owner ? esc(owner.name) + '’s challenge · ' : ''}${MON[parse(x.start).getMonth()]} ${parse(x.start).getDate()} to ${niceDate(chDate(c, len))}</small></div>
+      <div class="chprog">${prog}</div>
+      <div class="chbtns">
+        ${recordable ? `<button class="btn" data-act="chRecord" data-c="${esc(c)}" data-n="${now}">${svg.cam}Record Day ${now}</button>` : ''}
+        <button class="btn ${recordable ? 'ghost' : ''}" data-act="chPlay" data-c="${esc(c)}" data-n="${cur}">${svg.play}${now > len ? 'Watch from Day 1' : `Watch Day ${cur}`}</button>
+      </div>
+    </div>
+    <div class="toolbar chtools"><div class="seg"><button data-act="chView" data-v="cal" aria-pressed="${!grid}">Calendar</button><button data-act="chView" data-v="grid" aria-pressed="${grid}">Grid</button></div></div>
+    <div class="${grid ? 'chgrid' : 'chcal'}">${cells}</div>`;
+}
+function chTile(x, n, grid, now, mine){
+  const c = x.cid, v = vid(c, n), date = chDate(c, n), d = parse(date), did = chDid(c, n), likes = chLikes(c, n).length, cm = chComments(c, n).length;
+  const up = UPL.get(c + '_' + n);
+  const label = `Day ${n}, ${niceDate(date)}${v?.title ? ', ' + v.title : ''}${v ? '' : up !== undefined ? ', uploading' : ', no video yet'}${did.length ? ', done by ' + did.map(m => m.name).join(' and ') : ''}${likes ? `, ${likes} ${likes === 1 ? 'like' : 'likes'}` : ''}${cm ? `, ${cm} ${cm === 1 ? 'comment' : 'comments'}` : ''}`;
+  const act = v ? 'chPlay' : mine ? 'chDay' : 'chNone';
+  const art = v && !v.thumb && v.kind !== 'file';
+  const sub = grid ? `<span class="chd-m">${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}</span>` : (n === 1 || d.getDate() === 1) ? `<span class="chd-m">${MON[d.getMonth()]} ${d.getDate()}</span>` : '';
+  return `<button class="chday ${n === now ? 'today' : ''} ${v ? (art ? 'art' : '') : 'none'} ${n > now ? 'later' : ''}" data-act="${act}" data-c="${esc(c)}" data-n="${n}" aria-label="${esc(label)}">
+    ${v ? thumbHtml(v, 'chthumb') + (art ? `<span class="chd-play" aria-hidden="true">${svg.play}</span>` : '') : up === undefined ? `<span class="chd-plus" aria-hidden="true">${mine && n <= now ? '+' : ''}</span>` : ''}
+    ${up !== undefined ? `<span class="chd-up" style="--p:${up}" aria-hidden="true"><b>${up}%</b></span>` : ''}
+    <span class="chd-n" aria-hidden="true">${grid ? 'Day ' : ''}${n}</span>${sub}
+    ${did.length ? `<span class="chd-did" aria-hidden="true">${did.map(m => `<i style="--c:${esc(m.color)}"></i>`).join('')}</span>` : ''}
+    ${likes || cm ? `<span class="chd-soc" aria-hidden="true">${likes ? `♥<b>${likes}</b>` : ''}${likes && cm ? ' ' : ''}${cm ? `💬<b class="chd-c">${cm}</b>` : ''}</span>` : ''}</button>`;
+}
+
+/* ---- sheets: set up a challenge, one day, comments ---- */
+function chSetupSheet(c){
+  const me = needMe(() => chSetupSheet(c)); if(!me) return;
+  const x = c ? chGet(c) : null;
+  if(x && x.owner !== me.id){ toast(`Only ${mem(x.owner)?.name || 'its owner'} can change this challenge.`); return; }
+  const v = x || { title:'30-Day Challenge', emoji:'🎬', start: today() };
+  const lines = x ? Array.from({ length: CH_LEN }, (_, i) => { const r = chVid(c, i + 1); return r && !r.drive ? r.url || '' : ''; }) : [];
+  while(lines.length && !lines[lines.length - 1]) lines.pop();
+  sheet = { kind:'chSetup', c };
+  openSheet(`<h2>${x ? 'Edit challenge' : 'New 30-day challenge'}<small>${esc(me.name)}’s challenge, with its own calendar</small></h2>
+    <div class="two" style="grid-template-columns:1fr 84px">
+      <label class="field"><span>Name</span><input type="text" id="f-title" value="${esc(v.title)}" placeholder="30 days of push-ups" maxlength="40"></label>
+      <label class="field"><span>Emoji</span><input type="text" id="f-emoji" value="${esc(v.emoji || '')}" placeholder="💪" maxlength="4"></label>
+    </div>
+    <label class="field"><span>Day 1 is</span><input type="date" id="f-start" value="${esc(v.start)}"></label>
+    <details class="chmore" ${lines.length ? 'open' : ''}><summary>Add videos from the web instead (optional)</summary>
+      <label class="field"><span>One link per line</span><textarea id="f-links" rows="6" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="https://youtube.com/shorts/…&#10;https://www.tiktok.com/@…/video/…">${esc(lines.join('\n'))}</textarea></label>
+      <p class="note">Line 1 is Day 1, line 2 is Day 2, and so on. Leave a line blank to skip a day. Days you recorded aren’t listed here and stay as they are.</p>
+    </details>
+    <p class="note">To record, tap a day on your calendar, or use the Record button each day.</p>
+    ${x ? '<p class="note">Deleting the challenge also deletes its videos, likes and comments.</p>' : ''}
+    <div class="actions">${x ? '<button class="btn danger" data-act="chDelete">Delete</button>' : ''}<button class="btn ghost" data-act="closeSheet">Cancel</button><button class="btn" data-act="chSave">Save</button></div>`);
+}
+function chSave(){
+  const me = meMember(), title = $('#f-title').value.trim(), start = $('#f-start').value;
+  if(!me) return;
+  if(!title){ toast('Name the challenge.'); $('#f-title').focus(); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(start)){ toast('Pick the day it starts.'); return; }
+  const c = sheet.c || uid(), prev = chGet(c) || {};
+  put('rewards', '__chg_' + c, { title, emoji: $('#f-emoji').value.trim(), start, len: CH_LEN, owner: prev.owner || me.id, created: prev.created || Date.now() });
+  const lines = $('#f-links').value.split(/\r?\n/).map(s => s.trim());
+  while(lines.length && !lines[lines.length - 1]) lines.pop();
+  for(let n = 1; n <= CH_LEN; n++){
+    const url = lines[n - 1] || '', old = chVid(c, n);
+    if(old && old.drive) continue; // a recording stays unless removed on its own day
+    if(!url){ if(old) del('rewards', `__chv_${c}_${n}`); }
+    else if(!old || old.url !== url) put('rewards', `__chv_${c}_${n}`, { url, by: me.id, at: Date.now() });
+  }
+  closeSheet();
+  if(lines.length > CH_LEN) toast(`Only the first ${CH_LEN} links are used.`);
+  if(!sheet) setTimeout(() => $(`[data-act="chPlay"][data-c="${c}"]`)?.closest('.chhead')?.previousElementSibling?.scrollIntoView({ behavior: reducedMQ.matches ? 'auto' : 'smooth' }), 60);
+}
+function chDelete(c){
+  const x = chGet(c); if(!x) return;
+  chRows(`__chv_${c}_`).forEach(r => { if(r.drive) api('video', { step:'trash', id: r.drive }).catch(() => {}); });
+  [...S.rewards.keys()].filter(k => k === '__chg_' + c || ['__chv_', '__chl_', '__chx_', '__chc_'].some(p => String(k).startsWith(p + c + '_'))).forEach(k => del('rewards', k));
+}
+function chDaySheet(c, n){
+  const x = chGet(c); if(!x) return;
+  const me = needMe(() => chDaySheet(c, n)); if(!me) return;
+  if(x.owner !== me.id){ toast(`Only ${mem(x.owner)?.name || 'its owner'} can post on this challenge.`); return; }
+  const r = chVid(c, n) || {}, up = UPL.get(c + '_' + n);
+  sheet = { kind:'chDay', c, n };
+  openSheet(`<h2>Day ${n}<small>${niceDate(chDate(c, n))}</small></h2>
+    ${up !== undefined ? `<p class="note" style="margin:0 0 14px">Uploading, ${up}% done.</p>` : `
+    <div class="recbtns"><button class="btn" data-act="chRecord" data-c="${esc(c)}" data-n="${n}">${svg.cam}${r.drive || r.url ? 'Record again' : 'Record'}</button>
+      <button class="btn ghost" data-act="chPick" data-c="${esc(c)}" data-n="${n}">${svg.pick}From phone</button></div>`}
+    <label class="field"><span>Title (optional)</span><input type="text" id="f-title" value="${esc(r.title || '')}" placeholder="First 20 push-ups" maxlength="80"></label>
+    <label class="field"><span>Note (optional)</span><textarea id="f-note" maxlength="300" placeholder="Harder than it looks">${esc(r.note || '')}</textarea></label>
+    <details class="chmore" ${r.url && !r.drive ? 'open' : ''}><summary>Or use a link from the web</summary>
+      <label class="field"><span>Video link</span><input type="text" id="f-url" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" value="${esc(r.drive ? '' : r.url || '')}" placeholder="YouTube, TikTok, Instagram, Vimeo…"></label></details>
+    <div class="actions">${r.url || r.drive ? '<button class="btn danger" data-act="chDayDel">Remove</button>' : ''}<button class="btn ghost" data-act="closeSheet">Cancel</button><button class="btn" data-act="chDaySave">Save</button></div>`);
+}
+function chDaySave(){
+  const { c, n } = sheet, url = $('#f-url').value.trim(), old = chVid(c, n) || {}, me = meMember();
+  const title = $('#f-title').value.trim(), note = $('#f-note').value.trim();
+  if(url){
+    put('rewards', `__chv_${c}_${n}`, { url, title, note, by: me?.id, at: Date.now() });
+    if(old.drive) api('video', { step:'trash', id: old.drive }).catch(() => {});
+    closeSheet();
+    if(vidInfo(url).kind === 'link') toast('Saved. That site may not play inside Tandem, so it will open in a new tab.');
+    return;
+  }
+  if(!old.url && !old.drive){ toast('Record a video, choose one, or paste a link.'); return; }
+  put('rewards', `__chv_${c}_${n}`, { ...old, title, note });
+  closeSheet();
+}
+function cmtsHtml(c, n){
+  const me = meMember(), list = chComments(c, n);
+  if(!list.length) return '<p class="empty" style="text-align:center;margin:6px 0 18px">No comments yet. Say something nice.</p>';
+  return list.map(x => { const m = mem(x.memberId), mine = me && me.id === x.memberId;
+    return `<div class="cmt">${m ? avatar(m) : '<span class="av ghost"></span>'}<div class="grow"><b>${esc(m?.name || 'Someone')}</b> <small>${ago(x.at)}</small><p>${esc(x.text)}</p></div>
+      ${mine ? `<button class="x" data-act="chDelCmt" data-id="${esc(x.id)}" aria-label="Delete comment">${icon.x}</button>` : ''}</div>`; }).join('');
+}
+function chCommentsSheet(c, n){
+  const v = vid(c, n);
+  sheet = { kind:'chComments', c, n, count: chComments(c, n).length };
+  openSheet(`<h2>Day ${n} comments<small>${esc(v?.title || niceDate(chDate(c, n)))}</small></h2>
+    <div id="cmts">${cmtsHtml(c, n)}</div>
+    <div class="actions cmtbar"><input type="text" id="f-cmt" placeholder="Add a comment…" maxlength="300" enterkeyhint="send" autocomplete="off"><button class="btn" data-act="chPost">Post</button></div>`);
+  const s = $('#sheet'); s.scrollTop = s.scrollHeight;
+}
+function chPost(){
+  const inp = $('#f-cmt'), text = (inp?.value || '').trim(); if(!text || !sheet) return;
+  const { c, n } = sheet;
+  const me = needMe(() => chCommentsSheet(c, n)); if(!me) return;
+  put('rewards', `__chc_${c}_${uid()}`, { day: n, memberId: me.id, text, at: Date.now() });
+  inp.value = '';
+}
+function chLike(c, n){
+  const me = needMe(() => chLike(c, n)); if(!me) return;
+  const k = `__chl_${c}_${n}_${me.id}`;
+  if(S.rewards.has(k)) del('rewards', k);
+  else { fx(`chl:${c}:${n}`, 650); put('rewards', k, { day: n, memberId: me.id, at: Date.now() }); }
+}
+function chDidIt(c, n){
+  const me = needMe(() => chDidIt(c, n)); if(!me) return;
+  const k = `__chx_${c}_${n}_${me.id}`, x = chGet(c);
+  if(S.rewards.has(k)){ del('rewards', k); return; }
+  fx(`chx:${c}:${n}`, 650); put('rewards', k, { day: n, memberId: me.id, at: Date.now() });
+  const len = chLen(c); let all = true; for(let d = 1; d <= len; d++) if(!S.rewards.has(`__chx_${c}_${d}_${me.id}`)) all = false;
+  if(all) setTimeout(() => party(`${me.name} finished all ${len} days!`, `${x.emoji ? x.emoji + ' ' : ''}${x.title}`, 'confetti', me.color), 280);
+  else celebrate('habit', { name: me.name, thing: `Day ${n}`, color: me.color, sub: `${x.emoji ? x.emoji + ' ' : ''}${x.title}, Day ${n} of ${len}` });
+}
+
+/* ---- the full-screen player: one day per screen, swipe up for the next ---- */
+let reel = null; // { el, sc, c, n, obs, hist, t }
+function railHtml(c, n){
+  const me = meMember(), likes = chLikes(c, n), did = chDid(c, n), cm = chComments(c, n).length, mine = isMine(chGet(c));
+  const liked = !!me && likes.some(m => m.id === me.id), done = !!me && did.some(m => m.id === me.id);
+  const lk = `chl:${c}:${n}`, dk = `chx:${c}:${n}`, a = `data-c="${esc(c)}" data-n="${n}"`;
+  return `<button class="rail-b ${liked ? 'liked' : ''} ${liked && fxOn(lk) ? 'pop' : ''}" ${liked ? fxStyle(lk) : ''} data-act="chLike" ${a} aria-pressed="${liked}" aria-label="Like, ${likes.length}"><span class="rail-i">${svg.heart}</span><small>${likes.length || 'Like'}</small></button>
+    <button class="rail-b" data-act="chComments" ${a} aria-label="Comments, ${cm}"><span class="rail-i">${svg.chat}</span><small>${cm || 'Chat'}</small></button>
+    <button class="rail-b ${done ? 'did' : ''} ${done && fxOn(dk) ? 'pop' : ''}" ${done ? fxStyle(dk) : ''} data-act="chDid" ${a} aria-pressed="${done}" aria-label="I did it"><span class="rail-i">${svg.check}</span><small>${done ? 'Done' : 'Did it'}</small></button>
+    ${mine ? `<button class="rail-b" data-act="chDay" ${a} aria-label="Change this day’s video"><span class="rail-i">${svg.edit}</span><small>Edit</small></button>` : ''}`;
+}
+function capHtml(c, n, v){
+  const did = chDid(c, n), likes = chLikes(c, n), last = chComments(c, n).slice(-1)[0], lm = last && mem(last.memberId);
+  return `<div class="cap-day">Day ${n}<span> · ${niceDate(chDate(c, n))}${n === chToday(c) ? ' · Today' : ''}</span></div>
+    ${v?.title ? `<b class="cap-t">${esc(v.title)}</b>` : ''}${v?.note ? `<p class="cap-note">${esc(v.note)}</p>` : ''}
+    <div class="cap-row">
+      ${did.length ? `<span class="cap-tag"><span class="cap-avs">${did.map(m => avatar(m, 'sm')).join('')}</span>${did.length === members().length && did.length > 1 ? 'Both did it' : esc(did.map(m => m.name).join(' & ')) + ' did it'}</span>` : ''}
+      ${likes.length ? `<span class="cap-tag">♥ ${esc(likes.map(m => m.name).join(' & '))}</span>` : ''}
+      ${v && !['file', 'link'].includes(v.kind) && !v.rec ? `<a class="cap-tag" href="${esc(v.url)}" target="_blank" rel="noopener">${svg.open}Open</a>` : ''}
+    </div>
+    ${last ? `<button class="cap-cmt" data-act="chComments" data-c="${esc(c)}" data-n="${n}"><b>${esc(lm?.name || 'Someone')}</b> ${esc(last.text)}</button>` : ''}`;
+}
+function posterHtml(c, n, v){
+  if(!v){
+    const up = UPL.get(c + '_' + n);
+    if(up !== undefined) return `<div class="slide-none"><b>Uploading Day ${n}… ${up}%</b></div>`;
+    return `<div class="slide-none"><b>No video for Day ${n} yet.</b>${isMine(chGet(c)) ? `<button class="btn" data-act="chRecord" data-c="${esc(c)}" data-n="${n}">${svg.cam}Record</button>` : ''}</div>`;
+  }
+  return `<button class="poster" data-act="chMount" data-c="${esc(c)}" data-n="${n}" aria-label="Play Day ${n}">${thumbHtml(v, 'poster-img')}<span class="poster-play">${svg.play}</span></button>`;
+}
+const iframeHtml = (n, src) => `<iframe src="${esc(src)}" title="Day ${n} video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+function mediaHtml(n, v){
+  const src = v.kind === 'file' ? v.url : v.kind === 'drive' ? v.stream : '';
+  if(src) return `<video src="${esc(src)}" playsinline loop preload="auto" ${v.thumb ? `poster="${esc(v.thumb)}"` : ''} data-act="chTapVid"></video><button class="sound" data-act="chTapVid" hidden>Tap for sound</button>`;
+  if(v.embed) return iframeHtml(n, v.embed);
+  return `<div class="slide-none"><b>This video plays on its own site.</b><a class="btn" href="${esc(v.url)}" target="_blank" rel="noopener">Open video</a></div>`;
+}
+const mediaKey = (c, n, live) => { const v = vid(c, n); return (live ? 'live|' : '') + (v ? [v.url, v.thumb, v.embed, v.stream].join('|') : 'none|' + (UPL.get(c + '_' + n) ?? '')); };
+function slideHtml(c, n){
+  const v = vid(c, n);
+  return `<section class="slide" data-slide="${n}" aria-label="Day ${n}">
+    <div class="slide-bg" data-bg="${n}">${v?.thumb ? `<img src="${esc(v.thumb)}" alt="" referrerpolicy="no-referrer">` : ''}</div>
+    <div class="slide-body"><div class="slide-media" data-media="${n}" data-key="${esc(mediaKey(c, n))}">${posterHtml(c, n, v)}</div><div class="slide-rail" data-rail="${n}">${railHtml(c, n)}</div></div>
+    <div class="slide-cap" data-cap="${n}">${capHtml(c, n, v)}</div></section>`;
+}
+function openReel(c, n){
+  const x = chGet(c); if(!x || reel) return;
+  const len = chLen(c), owner = mem(x.owner); n = Math.min(Math.max(Number(n) || 1, 1), len);
+  const el = document.createElement('div'); el.id = 'reel';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', x.title);
+  el.innerHTML = `<div class="reel-top"><button class="reel-x" data-act="chClose" aria-label="Close">${icon.x}</button>${owner ? avatar(owner) : ''}<span class="reel-title">${x.emoji ? esc(x.emoji) + ' ' : ''}${esc(x.title)}</span><span class="reel-pos" id="reelPos" aria-live="polite"></span></div>
+    <div class="reel-scroll">${Array.from({ length: len }, (_, i) => slideHtml(c, i + 1)).join('')}</div>`;
+  document.body.appendChild(el); document.documentElement.classList.add('reel-open');
+  const sc = el.querySelector('.reel-scroll');
+  reel = { el, sc, c, n: 0, hist: false, t: 0 };
+  try { history.pushState({ tandemReel: 1 }, ''); reel.hist = true; } catch(e){}
+  sc.scrollTop = el.querySelector(`[data-slide="${n}"]`).offsetTop;
+  reel.obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) reelActivate(Number(e.target.dataset.slide)); }), { root: sc, threshold: .6 });
+  sc.querySelectorAll('.slide').forEach(s => reel.obs.observe(s));
+  reelActivate(n, true);
+  el.querySelector('.reel-x').focus({ preventScroll: true });
+}
+function reelActivate(n, now){
+  if(!reel || reel.n === n) return;
+  const prev = reel.n; reel.n = n;
+  if(prev) reelPoster(prev);
+  const pos = $('#reelPos'); if(pos) pos.textContent = `${n} / ${chLen(reel.c)}`;
+  clearTimeout(reel.t); // wait a moment so a fast flick past several days doesn't load each video
+  reel.t = setTimeout(() => { if(reel && reel.n === n) reelMount(n); }, now ? 0 : 220);
+}
+function reelPoster(n){
+  const m = reel?.el.querySelector(`[data-media="${n}"]`); if(!m) return;
+  m.innerHTML = posterHtml(reel.c, n, vid(reel.c, n)); m.dataset.key = mediaKey(reel.c, n);
+}
+function reelMount(n){
+  if(!reel) return;
+  const c = reel.c, m = reel.el.querySelector(`[data-media="${n}"]`), v = vid(c, n); if(!m) return;
+  if(!v){ reelPoster(n); return; }
+  m.innerHTML = mediaHtml(n, v); m.dataset.key = mediaKey(c, n, true);
+  const vd = m.querySelector('video'); if(!vd) return;
+  // a recording that Drive can't stream directly (very large, or a format this phone can't play) uses Drive's own player
+  if(v.kind === 'drive') vd.addEventListener('error', () => { if(m.isConnected && reel && reel.n === n){ m.innerHTML = iframeHtml(n, v.embed); } }, { once: true });
+  vd.play().catch(() => { vd.muted = true; const s = m.querySelector('.sound'); if(s) s.hidden = false; vd.play().catch(() => {}); });
+}
+function reelTapVid(btn){
+  const m = btn.closest('.slide-media'), vd = m?.querySelector('video'), s = m?.querySelector('.sound'); if(!vd) return;
+  if(vd.muted){ vd.muted = false; if(s) s.hidden = true; if(vd.paused) vd.play().catch(() => {}); }
+  else if(vd.paused) vd.play().catch(() => {}); else vd.pause();
+}
+function reelRefresh(){
+  if(!reel) return;
+  const c = reel.c; if(!chGet(c)){ closeReel(); return; }
+  reel.el.querySelectorAll('[data-rail]').forEach(r => { r.innerHTML = railHtml(c, Number(r.dataset.rail)); });
+  reel.el.querySelectorAll('[data-cap]').forEach(x => { const n = Number(x.dataset.cap); x.innerHTML = capHtml(c, n, vid(c, n)); });
+  reel.el.querySelectorAll('[data-media]').forEach(m => {
+    const n = Number(m.dataset.media), live = n === reel.n && m.dataset.key.startsWith('live|');
+    if(m.dataset.key === mediaKey(c, n, live)) return; // unchanged, so a playing video keeps playing
+    if(n === reel.n && (live || vid(c, n))) reelMount(n); else reelPoster(n);
+    const bg = reel.el.querySelector(`[data-bg="${n}"]`), v = vid(c, n);
+    if(bg) bg.innerHTML = v?.thumb ? `<img src="${esc(v.thumb)}" alt="" referrerpolicy="no-referrer">` : '';
+  });
+}
+function reelStep(d){
+  if(!reel) return; const next = reel.el.querySelector(`[data-slide="${reel.n + d}"]`);
+  if(next) reel.sc.scrollTo({ top: next.offsetTop, behavior: reducedMQ.matches ? 'auto' : 'smooth' });
+}
+function closeReel(fromBack){
+  if(!reel) return;
+  clearTimeout(reel.t); reel.obs && reel.obs.disconnect(); reel.el.remove();
+  document.documentElement.classList.remove('reel-open');
+  const hist = reel.hist; reel = null;
+  if(hist && fromBack !== true){ skipPop = true; history.back(); }
+}
+function chAfterRender(){
+  chMigrate();
+  reelRefresh();
+  if(sheet && sheet.kind === 'chComments'){
+    const box = $('#cmts'); if(!box) return;
+    const n = chComments(sheet.c, sheet.n).length, grew = n > sheet.count; sheet.count = n;
+    box.innerHTML = cmtsHtml(sheet.c, sheet.n);
+    if(grew){ const s = $('#sheet'); s.scrollTop = s.scrollHeight; }
   }
 }
 
@@ -1456,6 +2087,7 @@ function countdownStrip(){
 // The day counts roll up once a day when the Today screen first shows; "tomorrow" ones tick down live.
 let cdRolled = '';
 function afterRender(){
+  chAfterRender();
   const nums = document.querySelectorAll('.cd-num[data-n]');
   if(!nums.length || cdRolled === today()) return;
   cdRolled = today(); if(reducedMQ.matches) return;
@@ -1504,7 +2136,7 @@ function saveCountdown(){
 /* ---------- Notifications ----------
    The server wakes the phone; the phone's helper (sw.js) then asks the server what to show.
    It needs this phone's sign-in, so a copy is kept where the helper can read it. */
-const TABS = ['cal','chores','meals','lists','family'];
+const TABS = ['cal','chores','habits','meals','lists','family'];
 let pushState = 'checking', pushSynced = false;
 const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isStandalone = () => navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
@@ -1600,6 +2232,7 @@ async function notifSheet(){
       ${row('chores', 'Finishes a chore')}
       ${row('rewards', 'Cashes in a reward')}
       ${row('meals', 'Plans a meal')}
+      ${row('challenges', 'Posts, comments on or likes a challenge day', '', 'Likes only reach you when it’s your challenge')}
     </div>
     <p class="nhead">Reminders for you</p>
     <div class="ngroup">
@@ -1622,7 +2255,7 @@ async function notifSheet(){
 }
 async function saveNotif(){
   const v = id => $('#n-' + id), p = { memberId: sheet.memberId || '' };
-  ['events','items','chores','rewards','meals','remind','choreRemind','habitRemind','morning','countdowns','quiet'].forEach(k => p[k] = v(k).checked);
+  ['events','items','chores','rewards','meals','challenges','remind','choreRemind','habitRemind','morning','countdowns','quiet'].forEach(k => p[k] = v(k).checked);
   ['choreTime','habitTime','morningTime','quietFrom','quietTo'].forEach(k => p[k] = v(k).value);
   p.lead = Number(v('lead').value);
   const btn = $('[data-act="saveNotif"]'); if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
@@ -1634,7 +2267,7 @@ async function saveNotif(){
   const h = location.hash.slice(1);
   if(TABS.includes(h)){ st.tab = h; try { history.replaceState(null, '', location.pathname + location.search); } catch(e){} }
   if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => {
-    const t = e.data && e.data.tab; if(TABS.includes(t)){ if(sheet) closeSheet(); st.tab = t; window.scrollTo(0,0); render(); poll(); }
+    const t = e.data && e.data.tab; if(TABS.includes(t)){ if(sheet) closeSheet(); if(reel) closeReel(); st.tab = t; window.scrollTo(0,0); render(); poll(); }
   });
 })();
 
@@ -1662,6 +2295,7 @@ function closeSheet(fromBack){
 window.addEventListener('popstate', () => {
   if(skipPop){ skipPop = false; return; }
   if(!$('#sheetWrap').hidden) closeSheet(true);
+  else if(reel) closeReel(true);
 });
 // Swipe the top of a window down to close it
 (() => {
@@ -1690,6 +2324,9 @@ function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && $('#party')) closeParty();
   else if(e.key === 'Escape' && sheet) closeSheet();
+  else if(e.key === 'Escape' && reel) closeReel();
+  if(reel && !sheet && ['ArrowDown','ArrowUp','PageDown','PageUp',' '].includes(e.key) && !e.target.closest('input,textarea')){ e.preventDefault(); reelStep(e.key === 'ArrowUp' || e.key === 'PageUp' ? -1 : 1); }
+  if(e.key === 'Enter' && e.target.id === 'f-cmt'){ e.preventDefault(); chPost(); }
   if(e.key === 'Enter' && e.target.id === 'newItem'){ e.preventDefault(); addItem(); }
   if(e.key === 'Enter' && e.target.id === 'passIn'){ e.preventDefault(); unlock(); }
   if(e.key === 'Enter' && e.target.id === 'userIn'){ e.preventDefault(); $('#passIn')?.focus(); }
@@ -1739,10 +2376,10 @@ document.addEventListener('click', e => {
     case 'choreDay': st.choreDate = addDays(st.choreDate, Number(b.dataset.n)); render(); break;
     case 'choreToday': st.choreDate = today(); render(); break;
     case 'toggleChore': toggleChore(id, b); break;
-    case 'goChores': st.tab = 'chores'; st.choreDate = today(); st.choreMode = 'chores'; window.scrollTo(0,0); render(); break;
+    case 'goChores': st.tab = 'chores'; st.choreDate = today(); window.scrollTo(0,0); render(); break;
     case 'toggleAllChores': st.showAllChores = !st.showAllChores; render(); break;
     case 'newChore': choreSheet(); break;
-    case 'choreMode': st.choreMode = b.dataset.mode; st.showAllChores = false; render(); break;
+    case 'toggleAllHabits': st.showAllHabits = !st.showAllHabits; render(); break;
     case 'toggleHabit': toggleHabit(id); break;
     case 'newHabit': habitSheet(); break;
     case 'editHabit': habitSheet(id); break;
@@ -1769,6 +2406,31 @@ document.addEventListener('click', e => {
       if(celebSet('reward').on) celebrate('reward', { name: m.name, thing: r.title, color: m.color, sub: `${r.emoji ? r.emoji + ' ' : ''}${r.title}` });
       else toast(`${m.name} redeemed ${r.title}. Enjoy!`);
       break; }
+    // 30-day challenge
+    case 'chJump': $('#challenge')?.scrollIntoView({ behavior: reducedMQ.matches ? 'auto' : 'smooth' }); break;
+    case 'chNew': chSetupSheet(); break;
+    case 'chSetup': chSetupSheet(b.dataset.c); break;
+    case 'chSave': chSave(); break;
+    case 'chDelete': if(armed(b)){ chDelete(sheet.c); closeSheet(); } break;
+    case 'chView': st.chView = b.dataset.v; render(); break;
+    case 'chPlay': if(sheet) closeSheet(); openReel(b.dataset.c, Number(b.dataset.n)); break;
+    case 'chNone': toast('No video for this day yet.'); break;
+    case 'chClose': closeReel(); break;
+    case 'chMount': { const n = Number(b.dataset.n); if(reel && reel.n === n) reelMount(n); else { const s = reel?.el.querySelector(`[data-slide="${n}"]`); s && reel.sc.scrollTo({ top: s.offsetTop, behavior:'smooth' }); } break; }
+    case 'chTapVid': reelTapVid(b); break;
+    case 'chRecord': case 'chPick': { const c = b.dataset.c, n = Number(b.dataset.n), x = chGet(c);
+      const me = needMe(() => chDaySheet(c, n)); if(!me || !x) break;
+      if(x.owner !== me.id){ toast(`Only ${mem(x.owner)?.name || 'its owner'} can post on this challenge.`); break; }
+      pickVideo(c, n, act === 'chRecord'); break; }
+    case 'chDay': chDaySheet(b.dataset.c, Number(b.dataset.n)); break;
+    case 'chDaySave': chDaySave(); break;
+    case 'chDayDel': if(armed(b)){ const r = chVid(sheet.c, sheet.n); if(r && r.drive) api('video', { step:'trash', id: r.drive }).catch(() => {}); del('rewards', `__chv_${sheet.c}_${sheet.n}`); closeSheet(); } break;
+    case 'chLike': chLike(b.dataset.c, Number(b.dataset.n)); break;
+    case 'chDid': chDidIt(b.dataset.c, Number(b.dataset.n)); break;
+    case 'chComments': chCommentsSheet(b.dataset.c, Number(b.dataset.n)); break;
+    case 'chPost': chPost(); break;
+    case 'chDelCmt': if(armed(b)) del('rewards', id); break;
+    case 'chSetMe': { try { localStorage.setItem(ME_KEY, id); } catch(e){} const then = sheet && sheet.then; closeSheet(); then && then(); break; }
     // meals
     case 'mealWeek': st.mealWeek = fromToday(addDays(fromToday(st.mealWeek), Number(b.dataset.n))); render(); break;
     case 'mealThisWeek': st.mealWeek = today(); render(); break;

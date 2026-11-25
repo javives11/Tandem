@@ -1,7 +1,7 @@
 // Keeps the app's own files on the phone so it opens fast, even on a weak signal.
 // Your board's data always comes fresh from Google, never from this cache.
 // It also shows notifications: the server wakes it up, then it asks the server what to show.
-const CACHE = 'tandem-v10', META = 'tandem-meta';
+const CACHE = 'tandem-v11', META = 'tandem-meta';
 const FILES = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/tandem-192.png', 'icons/tandem-512.png', 'icons/tandem-touch-180.png', 'icons/tandem-badge-96.png'];
 
 self.addEventListener('install', e => {
@@ -46,8 +46,10 @@ async function showNew() {
     }
   } catch (e) {}
   if (!items.length) return self.registration.showNotification('Tandem', { body: 'Open Tandem to see what’s new.', icon, badge, tag: 'tandem' });
-  return Promise.all(items.slice(-4).map(i => self.registration.showNotification(i.title, { body: i.body, icon, badge, tag: i.id, data: { tab: i.tab || '' } })));
+  return Promise.all(items.slice(-4).map(i => self.registration.showNotification(i.title, { body: i.body, icon, badge, tag: i.id, data: { tab: tabFor(i) } })));
 }
+// Habits have their own tab now; reminders about them used to point at the chores tab.
+function tabFor(i){ const t = i.tab || ''; return t === 'chores' && /habit/i.test((i.title || '') + ' ' + (i.body || '')) ? 'habits' : t; }
 self.addEventListener('push', e => { e.waitUntil(showNew()); });
 self.addEventListener('notificationclick', e => {
   e.notification.close();
